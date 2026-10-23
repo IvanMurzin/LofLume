@@ -1,0 +1,15 @@
+{
+  "name": "loflume",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Project-local OpenSpec tooling; application stack is not selected yet.",
+  "scripts": {
+    "spec": "sh scripts/openspec",
+    "spec:list": "sh scripts/openspec list --json",
+    "spec:validate": "sh scripts/openspec validate --all --strict --no-interactive"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "devDependencies": {
+    "@fission-ai/openspec": "1.14.3"
+  }
+}

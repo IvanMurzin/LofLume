@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if command -v node >/dev/null 2>&1; then
+  node_bin=$(command -v node)
+else
+  node_bin="$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+fi
+if [ ! -x "$node_bin" ]; then
+  echo "Node.js >=20.19.0 is required. Install Node.js or run inside Codex with its bundled runtime." >&2
+  exit 1
+fi
+if [ ! -f "$project_dir/node_modules/@fission-ai/openspec/bin/openspec.js" ]; then
+  echo "OpenSpec is not installed. Run pnpm install --frozen-lockfile first." >&2
+  exit 1
+fi
+
+export OPENSPEC_TELEMETRY=0
+export XDG_CONFIG_HOME="$project_dir/.cache/openspec-config"
+export XDG_DATA_HOME="$project_dir/.cache/openspec-data"
+cd "$project_dir"
+exec "$node_bin" "$project_dir/node_modules/@fission-ai/openspec/bin/openspec.js" "$@"

@@ -1,0 +1,27 @@
+schema: spec-driven
+
+context: |
+  LofLume: solo pet project collaboratively developed with a non-code-reviewing product owner.
+  Product idea and application stack are not selected yet; do not assume a web app or database.
+  Write artifacts in Russian; retain template headings and structural tokens in English,
+  including Requirement, Scenario, SHALL/MUST, WHEN, and THEN, so CLI validation works.
+  Prefer small working user scenarios and simple implementation choices.
+  Engineering and model-budget rules live in AGENTS.md; do not copy them into artifacts.
+
+rules:
+  proposal:
+    - Keep the proposal concise, normally under 400 words. State the user outcome, scope, and explicit non-goals within the existing template.
+  specs:
+    - Describe observable behavior with concrete success and relevant failure scenarios. Avoid implementation details unless they are a real constraint.
+  design:
+    - Keep design proportional. Record consequential decisions, alternatives, and risks; omit speculative infrastructure and abstractions.
+  tasks:
+    - Use verifiable implementation steps and relevant validation tasks. Avoid tiny mechanical checklists and separate agent reviewer/QA tasks.
+
+operations:
+  apply:
+    guidance:
+      - Implement one coherent scenario at a time and run checks relevant to changed behavior; do not run repeated review loops.
+  archive:
+    guidance:
+      - Compare completed work with acceptance scenarios and summarize remaining limitations concisely.
