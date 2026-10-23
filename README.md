@@ -14,7 +14,7 @@ Pet-проект: идея и стек приложения пока не выб
 ./scripts/openspec validate --all --strict --no-interactive
 ```
 
-Для новой машины: Node.js >=20.19.0, pnpm 11.25.0,
+Для новой машины: Node.js >=22, pnpm 11.25.0,
 затем `pnpm install --frozen-lockfile`. Запускатель также поддерживает Node из Codex.
 
 Правила: [AGENTS.md](AGENTS.md). Настройки: [openspec/config.yaml](openspec/config.yaml).

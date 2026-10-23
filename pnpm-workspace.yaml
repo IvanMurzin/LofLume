@@ -1,0 +1,2 @@
+cacheDir: .cache/pnpm-cache
+storeDir: .cache/pnpm-store

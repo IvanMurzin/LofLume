@@ -33,7 +33,7 @@
 - Keep lockfiles, do not silently upgrade dependencies, and do not commit or push unless requested.
 
 ## Current tooling
-- Node.js >=20.19.0; pnpm 11.25.0. Restore: `pnpm install --frozen-lockfile`.
+- Node.js >=22; pnpm 11.25.0. Restore: `pnpm install --frozen-lockfile`.
 - CLI: `./scripts/openspec`; status: `pnpm spec:list`; validation: `pnpm spec:validate`.
 - User guide and source references: `docs/WORKFLOW.md` (read for onboarding, not before every edit).
 - No application, build, lint, or application tests exist yet.
