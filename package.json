@@ -2,14 +2,25 @@
   "name": "loflume",
   "version": "0.0.0",
   "private": true,
-  "description": "Project-local OpenSpec tooling; application stack is not selected yet.",
+  "description": "A cozy lo-fi room for coding. Scene-first, desktop-first.",
   "scripts": {
     "spec": "sh scripts/openspec",
     "spec:list": "sh scripts/openspec list --json",
-    "spec:validate": "sh scripts/openspec validate --all --strict --no-interactive"
+    "spec:validate": "sh scripts/openspec validate --all --strict --no-interactive",
+    "dev": "sh scripts/app dev",
+    "build": "sh scripts/app build",
+    "preview": "sh scripts/app preview",
+    "typecheck": "sh scripts/app typecheck",
+    "test": "sh scripts/app test"
   },
   "packageManager": "pnpm@11.25.0",
   "devDependencies": {
-    "@fission-ai/openspec": "1.14.3"
-  }
+    "@fission-ai/openspec": "1.14.3",
+    "vite": "8.3.5",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "type": "module"
 }

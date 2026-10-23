@@ -1,0 +1,68 @@
+{
+  "source": "https://opengameart.org/content/chill-beats-collection",
+  "license": "CC0 1.0 Universal",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "retrieved": "2026-10-24",
+  "tracks": [
+    {
+      "id": "city-in-the-rearview",
+      "title": "City In The Rearview",
+      "url": "/audio/city-in-the-rearview.mp3",
+      "artist": "Holizna",
+      "source": "https://opengameart.org/content/chill-beats-collection",
+      "license": "CC0 1.0",
+      "sha256": "827792ba6c4a8974d13b023d0057e643c0a6f39f866067774cdec7a56bb93007",
+      "bytes": 2811725
+    },
+    {
+      "id": "autumn",
+      "title": "Autumn",
+      "url": "/audio/autumn.mp3",
+      "artist": "Holizna",
+      "source": "https://opengameart.org/content/chill-beats-collection",
+      "license": "CC0 1.0",
+      "sha256": "19e62fd59fa9c5d7af7a5743b2e88bf94f869ff95f6c3cf89b7f4b4ea8cb1264",
+      "bytes": 2718088
+    },
+    {
+      "id": "families",
+      "title": "Families",
+      "url": "/audio/families.mp3",
+      "artist": "Holizna",
+      "source": "https://opengameart.org/content/chill-beats-collection",
+      "license": "CC0 1.0",
+      "sha256": "3f004668edefc7707dcf937037c93cb322c0b95e215024aba8df04152f500537",
+      "bytes": 2304311
+    },
+    {
+      "id": "opinions",
+      "title": "Opinions",
+      "url": "/audio/opinions.mp3",
+      "artist": "Holizna",
+      "source": "https://opengameart.org/content/chill-beats-collection",
+      "license": "CC0 1.0",
+      "sha256": "fded91dc9ebb965125b60679b8048114e8ee5d946a54bee4d2b110333dcb5491",
+      "bytes": 2688415
+    },
+    {
+      "id": "old-age",
+      "title": "Old Age",
+      "url": "/audio/old-age.mp3",
+      "artist": "Holizna",
+      "source": "https://opengameart.org/content/chill-beats-collection",
+      "license": "CC0 1.0",
+      "sha256": "256c268456c2aca3428efa488c949d25c39e48900086671fc002fec3bf53e5d4",
+      "bytes": 3423186
+    },
+    {
+      "id": "dream-pop",
+      "title": "Dream Pop",
+      "url": "/audio/dream-pop.mp3",
+      "artist": "Holizna",
+      "source": "https://opengameart.org/content/chill-beats-collection",
+      "license": "CC0 1.0",
+      "sha256": "764762a41e399b31a3f865c9bd84106f2b8f27af38a12535db7e186b82532372",
+      "bytes": 3867897
+    }
+  ]
+}

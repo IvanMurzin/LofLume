@@ -2,7 +2,8 @@ schema: spec-driven
 
 context: |
   LofLume: solo pet project collaboratively developed with a non-code-reviewing product owner.
-  Product idea and application stack are not selected yet; do not assume a web app or database.
+  Product: desktop-first cozy lo-fi coding web room. First version: one home room, original woman coding, no rain or ambience, free curated music, timer, lamp.
+  Stack: native TypeScript/CSS with Vite; no backend. Follow the five product acceptance stages in the active change.
   Write artifacts in Russian; retain template headings and structural tokens in English,
   including Requirement, Scenario, SHALL/MUST, WHEN, and THEN, so CLI validation works.
   Prefer small working user scenarios and simple implementation choices.

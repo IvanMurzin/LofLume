@@ -1,7 +1,7 @@
 # LofLume — working agreement
 
 ## Collaboration
-- LofLume is a solo pet project. Product idea and application stack are not selected yet; do not invent them.
+- LofLume is a desktop-first lo-fi web room for coding. The approved first version is one cozy home room, an original woman at a computer, no rain or ambience, curated free music, a focus timer and a lamp. See the active cozy-coding-room change for scope; stop for product acceptance after each of its five stages.
 - Discuss behavior, scope, and meaningful tradeoffs in Russian. Own implementation, debugging, and verification; do not require the user to review code.
 - Ask about ambiguities that materially affect behavior, cost, data, or acceptance. Make routine technical choices autonomously; record consequential decisions in the active change's design.
 - Keep updates concise: what works, what was checked, and remaining limitations.
@@ -33,7 +33,9 @@
 - Keep lockfiles, do not silently upgrade dependencies, and do not commit or push unless requested.
 
 ## Current tooling
-- Node.js >=22; pnpm 11.25.0. Restore: `pnpm install --frozen-lockfile`.
+- Node.js >=22.12; pnpm 11.25.0. Restore: `pnpm install --frozen-lockfile`.
 - CLI: `./scripts/openspec`; status: `pnpm spec:list`; validation: `pnpm spec:validate`.
 - User guide and source references: `docs/WORKFLOW.md` (read for onboarding, not before every edit).
-- No application, build, lint, or application tests exist yet.
+- Application: native TypeScript/CSS, Vite. Run `pnpm dev`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm preview`. `scripts/app` supports the bundled Codex Node runtime when node is absent from PATH.
+- Stages 1–2 are accepted: user-selected scene, timed handwritten discovery, silhouette hover and steam (no water shimmer). Stage 3 adds local CC0 music through the radio; wait for product listening feedback before stage 4.
+- `pnpm test` runs focused music state and failure regression tests with Node type stripping. No lint command exists. Do browser QA for visual changes.
