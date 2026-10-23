@@ -6,15 +6,15 @@ export function initMusic(): () => void {
   const panel = document.querySelector<HTMLElement>('#music-panel')!;
   const audio = document.querySelector<HTMLAudioElement>('#scene-audio')!;
   const play = document.querySelector<HTMLButtonElement>('#music-play')!;
-  const next = document.querySelector<HTMLButtonElement>('#music-next')!;
   const close = document.querySelector<HTMLButtonElement>('#music-close')!;
   const title = document.querySelector<HTMLElement>('#music-title')!;
   const artist = document.querySelector<HTMLElement>('#music-artist')!;
   const message = document.querySelector<HTMLElement>('#music-message')!;
   const volume = document.querySelector<HTMLInputElement>('#music-volume')!;
   const volumeValue = document.querySelector<HTMLOutputElement>('#music-volume-value')!;
-  const trackNumber = document.querySelector<HTMLElement>('#music-track-number')!;
-  const credits = document.querySelector<HTMLUListElement>('#music-credits')!;
+  const nowPlaying = document.querySelector<HTMLElement>('#now-playing')!;
+  const roomCaption = document.querySelector<HTMLElement>('#room-caption')!;
+  let displayedTrack = '';
   let savedVolume = .45;
   try {
     const saved = localStorage.getItem('loflume.music.volume');
@@ -22,28 +22,29 @@ export function initMusic(): () => void {
   } catch { /* Playback does not depend on browser storage. */ }
   const player = new SceneMusic(audio, tracks, savedVolume);
 
-  for (const track of tracks) {
-    const item = document.createElement('li');
-    const source = document.createElement('a');
-    source.textContent = `${track.title} — ${track.artist}`;
-    source.href = track.source;
-    source.target = '_blank';
-    source.rel = 'noopener noreferrer';
-    item.append(source, document.createTextNode(` · ${track.license}`));
-    credits.append(item);
-  }
-
   const unsubscribe = player.subscribe(state => {
     title.textContent = state.track.title;
     artist.textContent = state.track.artist;
-    trackNumber.textContent = `${state.index + 1} / ${tracks.length}`;
+    const playing = state.phase === 'playing';
+    nowPlaying.hidden = !playing;
+    roomCaption.hidden = playing;
+    if (displayedTrack !== state.track.id) {
+      displayedTrack = state.track.id;
+      for (const name of nowPlaying.querySelectorAll('.ticker-title')) name.textContent = state.track.title;
+      for (const link of nowPlaying.querySelectorAll<HTMLAnchorElement>('.ticker-artist')) {
+        link.textContent = state.track.artist;
+        link.href = state.track.artistUrl ?? state.track.source;
+      }
+      nowPlaying.setAttribute('aria-label', 'Сейчас играет: ' + state.track.title + ' — ' + state.track.artist);
+    }
     const active = state.phase === 'playing' || state.phase === 'loading';
     play.textContent = state.phase === 'error' ? 'Попробовать ещё раз' : active ? 'Пауза' : 'Включить';
     play.setAttribute('aria-label', state.phase === 'error' ? 'Повторить запуск музыки' : active ? 'Пауза' : 'Включить музыку');
     panel.dataset.phase = state.phase;
     radio.classList.toggle('is-playing', state.phase === 'playing');
     radio.setAttribute('aria-label', state.phase === 'playing' ? 'Радио — музыка играет' : 'Радио — включить музыку');
-    message.textContent = state.error ?? (state.phase === 'loading' ? 'Настраиваем волну…' : state.phase === 'playing' ? 'Тихая музыка для твоего вечера' : 'Lo-fi без спешки');
+    message.textContent = state.error ?? (state.phase === 'loading' ? 'Загрузка…' : '');
+    message.hidden = !message.textContent;
     volume.value = String(Math.round(state.volume * 100));
     volumeValue.value = `${Math.round(state.volume * 100)}%`;
   });
@@ -71,7 +72,6 @@ export function initMusic(): () => void {
     if (target instanceof Node && !panel.contains(target) && !radio.contains(target)) closePanel(false);
   });
   play.addEventListener('click', () => player.toggle());
-  next.addEventListener('click', () => player.next());
   volume.addEventListener('input', () => {
     player.setVolume(Number(volume.value) / 100);
     try { localStorage.setItem('loflume.music.volume', String(player.state.volume)); } catch { /* Optional. */ }

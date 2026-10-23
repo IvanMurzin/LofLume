@@ -45,14 +45,12 @@
             </g>
           </svg>
           <section class="music-panel" id="music-panel" role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden>
-            <header class="music-panel-heading"><span id="music-heading">Вечерняя волна</span><button class="music-close" id="music-close" type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
-            <p class="music-caption">LO-FI RADIO <span id="music-track-number"></span></p>
+            <header class="music-panel-heading"><span id="music-heading">Радио LofLume</span><button class="music-close" id="music-close" type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" class="music-title" aria-live="polite"></p>
             <p id="music-artist" class="music-artist"></p>
             <p id="music-message" class="music-message" role="status"></p>
-            <div class="music-actions"><button id="music-play" class="music-play" type="button">Включить</button><button id="music-next" class="music-next" type="button" aria-label="Следующий трек" title="Следующий трек"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 5 10 7L6 19ZM19 5v14"/></svg></button></div>
+            <div class="music-actions"><button id="music-play" class="music-play" type="button">Включить</button></div>
             <div class="music-volume"><label for="music-volume">Громкость</label><output id="music-volume-value" for="music-volume">45%</output><input id="music-volume" aria-label="Громкость музыки" type="range" min="0" max="100" value="45" /></div>
-            <details class="music-about"><summary>Музыка и автор</summary><p>Бесплатная подборка Holizna. <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener noreferrer">CC0 1.0</a>.</p><ul id="music-credits"></ul></details>
           </section>
           <audio id="scene-audio" preload="none"></audio>
         </div>
@@ -63,7 +61,14 @@
         <button class="icon-button" id="fullscreen" type="button" aria-label="На весь экран" title="На весь экран"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button>
       </header>
       <footer class="room-footer">
-        <div class="room-caption"><p class="eyebrow">Дома, после заката</p><h1>Тихий вечер</h1></div>
+        <div class="room-caption" id="room-caption"><p class="eyebrow">Дома, после заката</p><h1>Тихий вечер</h1></div>
+        <div class="now-playing" id="now-playing" hidden aria-label="Сейчас играет">
+          <svg class="now-playing-note" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 14V4l8-2v10M8 5l8-2"/><ellipse cx="5" cy="15" rx="3" ry="2"/><ellipse cx="13" cy="13" rx="3" ry="2"/></svg>
+          <div class="ticker-viewport"><div class="ticker-track">
+            <span class="ticker-copy"><span class="ticker-title"></span><span aria-hidden="true"> — </span><a class="ticker-artist" target="_blank" rel="noopener noreferrer"></a></span>
+            <span class="ticker-copy" aria-hidden="true"><span class="ticker-title"></span><span> — </span><a class="ticker-artist" tabindex="-1" target="_blank" rel="noopener noreferrer"></a></span>
+          </div></div>
+        </div>
         <button class="explore-button" id="explore" type="button" aria-pressed="false" aria-controls="landmarks"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg><span>Осмотреться</span></button>
       </footer>
       <p id="status" class="sr-only" role="status" aria-live="polite"></p>

@@ -1,4 +1,4 @@
-export type Track = { id: string; title: string; url: string; artist: string; source: string; license: string };
+export type Track = { id: string; title: string; url: string; artist: string; artistUrl?: string; source: string; license: string };
 export type MusicState = { track: Track; index: number; phase: 'idle' | 'loading' | 'playing' | 'paused' | 'error'; volume: number; error: string | null };
 type AudioPort = Pick<HTMLAudioElement, 'src' | 'currentTime' | 'ended' | 'volume' | 'play' | 'pause' | 'load' | 'addEventListener' | 'removeEventListener'>;
 
@@ -72,7 +72,7 @@ export class SceneMusic {
     else void this.play();
   }
 
-  next(): void {
+  private advance(): void {
     const resume = this.wanted;
     ++this.request;
     this.wanted = false;
@@ -101,7 +101,7 @@ export class SceneMusic {
     this.notify();
   }
 
-  private onEnded = (): void => { if (this.wanted) this.next(); };
+  private onEnded = (): void => { if (this.wanted) this.advance(); };
   private onError = (): void => { if (this.loaded) this.fail(); };
   private onPlaying = (): void => { if (this.wanted) { this.phase = 'playing'; this.error = null; this.notify(); } };
   private onPause = (): void => {

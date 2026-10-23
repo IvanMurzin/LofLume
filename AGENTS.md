@@ -30,7 +30,7 @@
 - Deliver small, runnable scenarios. Check changed behavior and important failure cases; add useful regression checks for bugs. Run and inspect UI changes when browser tooling is available.
 - Use actual build, type, lint, and test commands once they exist, and add them here when the stack is selected. OpenSpec validation is not application testing.
 - Before completion, inspect the diff when Git exists, run relevant available checks, and report unverified behavior. Avoid tests that merely mirror implementation or test documentation wording.
-- Keep lockfiles, do not silently upgrade dependencies, and do not commit or push unless requested.
+- Keep lockfiles and do not silently upgrade dependencies. The user has authorized timely commits and pushes for this project: commit verified coherent changes and push to origin at product checkpoints; never force-push or overwrite unrelated changes.
 
 ## Current tooling
 - Node.js >=22.12; pnpm 11.25.0. Restore: `pnpm install --frozen-lockfile`.

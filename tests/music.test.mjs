@@ -31,9 +31,9 @@ test('ended plays the next track and wraps after the last', async()=>{
  assert.equal(audio.plays,4);
 });
 
-test('manual next while paused changes track without resuming', async()=>{
- const audio=new AudioStub();const player=new SceneMusic(audio,tracks);await player.play();player.pause();player.next();
- assert.equal(player.state.track.id,'b');assert.equal(audio.paused,true);assert.equal(audio.plays,1);
+test('a late ended event while paused cannot change the station track', async()=>{
+ const audio=new AudioStub();const player=new SceneMusic(audio,tracks);await player.play();player.pause();audio.dispatchEvent(new Event('ended'));
+ assert.equal(player.state.track.id,'a');assert.equal(player.state.phase,'paused');assert.equal(audio.plays,1);
 });
 
 test('failed playback can be retried, without leaving a stale error', async()=>{
