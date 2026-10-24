@@ -24,7 +24,6 @@ export function App() {
   }, []);
   function openPanel() {
     setPanelOpen(true);
-    music.startIfIdle();
     // An already open panel should also return focus to its main action.
     playRef.current?.focus({ preventScroll: true });
   }

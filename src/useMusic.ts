@@ -27,7 +27,6 @@ export function useMusic() {
   }, []);
   return {
     audioRef, state,
-    startIfIdle() { if (playerRef.current?.state.phase === 'idle') void playerRef.current.play(); },
     toggle() { playerRef.current?.toggle(); },
     setVolume(value: number) {
       const player = playerRef.current;
