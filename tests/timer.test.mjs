@@ -80,3 +80,23 @@ test('a sub-minute session finishes and pauses with second precision', () => {
   assert.equal(state.deadline,33750);
   assert.equal(timerReducer(state,{type:'tick',now:33750}).phase,'finished');
 });
+
+test('tab title follows running, paused and finished time and resets when idle', async () => {
+  const { getTimerTitle } = await import('../src/timer.ts');
+  assert.equal(getTimerTitle(createTimer()),'LofLume — Home Work');
+  let state=timerReducer(createTimer(),{type:'start',seconds:1500,now:0});
+  state=timerReducer(state,{type:'tick',now:6000});
+  assert.equal(getTimerTitle(state),'LofLume | 24:54');
+  state=timerReducer(state,{type:'pause',now:6000});
+  assert.equal(getTimerTitle(state),'LofLume | 24:54');
+  state=timerReducer(state,{type:'resume',now:10000});
+  state=timerReducer(state,{type:'tick',now:2000000});
+  assert.equal(getTimerTitle(state),'LofLume | 00:00');
+  assert.equal(getTimerTitle(timerReducer(state,{type:'reset'})),'LofLume — Home Work');
+});
+
+test('unavailable audio cannot break timer feedback', async () => {
+  const { TimerChime } = await import('../src/timerChime.ts');
+  const signal=new TimerChime();
+  assert.doesNotThrow(()=>{signal.prepare();signal.play(.45);signal.cancel();signal.dispose();});
+});

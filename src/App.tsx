@@ -7,11 +7,18 @@ import { useFocusTimer } from './useFocusTimer.ts';
 import { ClockDisplay } from './ClockDisplay.tsx';
 import { TimerPanel } from './TimerPanel.tsx';
 import { formatTimer } from './timer.ts';
+import { useTimerFeedback } from './useTimerFeedback.ts';
+import { TimerNotice } from './TimerNotice.tsx';
 
 export function App() {
   const room = useRoom();
   const music = useMusic();
   const timer = useFocusTimer();
+  const timerFeedback = useTimerFeedback(timer.state, music.state.volume);
+  const toggleTimer = () => {
+    if (timer.state.phase !== "running" && timer.valid) timerFeedback.prepareSound();
+    timer.toggle();
+  };
   const [timerOpen, setTimerOpen] = useState(false);
   const clockRef = useRef<SVGGElement>(null);
   const closeTimer = useCallback((returnFocus = true) => {
@@ -62,9 +69,9 @@ export function App() {
         <div className="scene" id="scene">
           <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt="Девушка в наушниках работает за ноутбуком у окна. За окном закат над городом и рекой. На столе — чашка, часы, радио и лампа." fetchPriority="high" width="1672" height="941" />
           <ClockDisplay state={timer.state} />
-          <p className="timer-complete" hidden={timer.state.phase !== "finished"}>Время вышло</p>
-          <TimerPanel timer={timer} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />
-          <SceneArtwork clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <TimerNotice visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
+          <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />
+          <SceneArtwork clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">Радио LofLume</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>

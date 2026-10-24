@@ -296,7 +296,6 @@ h1 {
 @media (max-height: 500px) and (orientation: landscape) { .timer-panel { right: 13%; bottom: 15%; max-height: 60svh; } }
 @media (prefers-reduced-motion: reduce) { .clock-colon { animation: none; opacity: .85; } }
 
-.timer-complete { position: absolute; right: 15%; bottom: 14%; margin: 0; padding: 6px 10px; border: 1px solid rgb(245 215 172 / 15%); border-radius: 7px; color: #f8e8d1; background: rgb(38 30 24 / 85%); font-size: 11px; pointer-events: none; }
 @media (max-height: 500px) and (orientation: landscape) {
   .timer-panel { padding: 12px 16px; }
   .timer-readout { margin-top: 10px; padding-block: 8px; }
@@ -308,3 +307,26 @@ h1 {
 
 .timer-unit input::selection { color: #fff0d2; background: rgb(245 215 172 / 22%); }
 .timer-unit input[readonly] { cursor: default; caret-color: transparent; }
+
+.timer-notice-slot { position: absolute; left: 80.2%; bottom: 29.5%; transform: translateX(-50%); z-index: 2; }
+.timer-notice { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgb(255 235 206 / 12%); border-radius: 8px; background: rgb(30 25 23 / 62%); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #f1dbb7; white-space: nowrap; animation: timer-notice-in 280ms ease both; }
+.timer-notice:hover { border-color: rgb(235 203 151 / 35%); }
+.timer-notice-icon { display: grid; place-items: center; }
+.timer-notice-icon svg { width: 17px; height: 17px; stroke-width: 1.25; }
+.timer-notice-copy { font-family: Caveat, cursive; font-size: 23px; line-height: 1; }
+.timer-notice.is-leaving { animation: timer-notice-out 240ms ease both; pointer-events: none; }
+@keyframes timer-notice-in { from { opacity: 0; transform: translateY(5px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes timer-notice-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(4px) scale(.98); } }
+@media (max-width: 700px) and (orientation: portrait) {
+  .timer-notice { padding: 6px 9px; gap: 5px; }
+  .timer-notice-copy { font-size: 20px; }
+  .timer-notice-icon svg { width: 14px; height: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .timer-notice, .timer-notice.is-leaving { animation: none; } }
+/* On smaller scenes the notice needs a little more clearance from the radio. */
+@container (max-width: 1200px) { .timer-notice-slot { bottom: 35.5%; } }
+/* Keep the timer controls beside the clock, clear of its completion notice. */
+@media (min-width: 701px) { .timer-panel { right: calc(19.8% + 90px); } }
+@media (max-width: 700px) and (orientation: portrait) {
+  .scene:has(#timer-panel:not([hidden])) .timer-notice-slot { visibility: hidden; }
+}

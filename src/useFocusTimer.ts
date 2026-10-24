@@ -12,7 +12,7 @@ export function useFocusTimer() {
     const syncVisibility = () => {
       clearInterval(interval);
       tick();
-      if (!document.hidden) interval = setInterval(tick, 250);
+      interval = setInterval(tick, document.hidden ? 1000 : 250);
     };
     document.addEventListener('visibilitychange', syncVisibility);
     window.addEventListener('pageshow', syncVisibility);
