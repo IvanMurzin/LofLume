@@ -280,7 +280,7 @@ h1 {
 .timer-panel { right: 13%; bottom: 31%; width: 280px; padding: 18px 20px 20px; }
 .timer-readout { display: flex; justify-content: center; align-items: flex-start; gap: 4px; margin-top: 24px; padding: 16px 0; border-block: 1px solid rgb(245 215 172 / 8%); }
 .timer-unit { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; flex: 1; }
-.timer-unit > span:last-child { font-size: 9px; letter-spacing: .6px; color: #b6a694; }
+.timer-unit > span:last-child { font-size: 9px; line-height: 13px; letter-spacing: .6px; color: #b6a694; }
 .timer-unit input, .timer-number { font-family: DSEG, monospace; font-weight: 300; color: #f2ddb2; font-variant-numeric: tabular-nums; line-height: 1.4; }
 .timer-unit input { width: 100%; height: 56px; padding: 6px 0; border: 1px solid transparent; border-radius: 5px; background: transparent; font-size: 27px; text-align: center; caret-color: #f2ddb2; transition: background 160ms ease, border-color 160ms ease; }
 .timer-unit input:not([readonly]):hover { background: rgb(245 215 172 / 5%); border-color: rgb(245 215 172 / 12%); }
@@ -305,3 +305,6 @@ h1 {
   .timer-separator { line-height: 44px; }
   .timer-actions { margin-top: 12px; }
 }
+
+.timer-unit input::selection { color: #fff0d2; background: rgb(245 215 172 / 22%); }
+.timer-unit input[readonly] { cursor: default; caret-color: transparent; }
