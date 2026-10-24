@@ -1,8 +1,8 @@
 import type { RefObject } from "react";
 
-type Props = { exploring: boolean; playing: boolean; panelOpen: boolean; radioRef: RefObject<SVGGElement | null>; onOpenRadio: () => void };
+type Props = { exploring: boolean; playing: boolean; panelOpen: boolean; radioRef: RefObject<SVGGElement | null>; onOpenRadio: () => void; clockRef: RefObject<SVGGElement | null>; timerOpen: boolean; timerLabel: string; onOpenTimer: () => void };
 
-export function SceneArtwork({ exploring, playing, panelOpen, radioRef, onOpenRadio }: Props) {
+export function SceneArtwork({ exploring, playing, panelOpen, radioRef, onOpenRadio, clockRef, timerOpen, timerLabel, onOpenTimer }: Props) {
   return <>
           <svg className="atmosphere" viewBox="0 0 1672 941" aria-hidden="true" focusable="false">
             <defs>
@@ -18,7 +18,7 @@ export function SceneArtwork({ exploring, playing, panelOpen, radioRef, onOpenRa
             <defs>
               <marker id="pencil-arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse"><path d="M2 2 Q6 5 10 6 Q6 7 2 10"/></marker>
             </defs>
-            <g className="object-target" data-object="timer" tabIndex={0} role="img" aria-label="Часы">
+            <g ref={clockRef} onClick={onOpenTimer} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onOpenTimer(); } }} className="object-target" data-object="timer" tabIndex={0} role="button" aria-label={timerLabel} aria-haspopup="dialog" aria-expanded={timerOpen} aria-controls="timer-panel">
               <path className="object-shape" d="M1281 679 Q1271 677 1269 690 L1261 748 Q1258 761 1271 765 L1393 780 Q1408 783 1412 769 L1420 707 Q1420 694 1407 691 Z"/>
             </g>
             <g ref={radioRef} onClick={onOpenRadio} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onOpenRadio(); } }} className={playing ? "object-target is-playing" : "object-target"} data-object="music" tabIndex={0} role="button" aria-label={playing ? "Радио — музыка играет" : "Радио — включить музыку"} aria-haspopup="dialog" aria-expanded={panelOpen} aria-controls="music-panel">

@@ -268,3 +268,28 @@ h1 {
   .ticker-copy[aria-hidden] { display: none; }
   .ticker-viewport { mask-image: none; }
 }
+
+/* Live clock face stays in the same coordinates as its case and hover shape. */
+.clock-display { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.clock-digits { fill: #f4e5ad; color: #f4e5ad; filter: drop-shadow(0 0 1.2px rgb(245 219 149 / 24%)); }
+.clock-colon { animation: clock-breathe 3.6s ease-in-out infinite; }
+@keyframes clock-breathe { 0%, 100% { opacity: .95; } 50% { opacity: .3; } }
+:root[data-scene-paused] .clock-colon { animation-play-state: paused; }
+[data-object="timer"] { cursor: pointer; }
+.timer-panel { right: 13%; bottom: 31%; width: 260px; }
+.timer-duration { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 22px; color: #d0bfac; }
+.timer-duration input { width: 76px; padding: 8px; border: 1px solid rgb(245 215 172 / 24%); border-radius: 6px; background: rgb(0 0 0 / 15%); color: #f8e8d1; font: inherit; font-size: 16px; text-align: center; }
+.timer-duration input:focus-visible { outline: 2px solid #f7dfb5; outline-offset: 2px; }
+.timer-duration input:disabled { opacity: .6; }
+.timer-duration input[aria-invalid=true] { border-color: #f2b29b; }
+.timer-error { font-size: 10px; color: #f2b29b; margin: 8px 0 0; }
+.timer-actions { display: flex; gap: 8px; margin-top: 20px; }
+.timer-reset { padding: 10px; border: 1px solid rgb(245 215 172 / 20%); border-radius: 8px; font-size: 11px; background: transparent; }
+.timer-reset:hover:enabled { background: rgb(245 215 172 / 7%); }
+.timer-actions button:disabled { cursor: default; opacity: .4; }
+.timer-phase { margin: 12px 0 0; color: #d0bfac; font-size: 11px; }
+@media (max-width: 700px) and (orientation: portrait) { .timer-panel { right: 16px; bottom: 31%; } }
+@media (max-height: 500px) and (orientation: landscape) { .timer-panel { right: 13%; bottom: 15%; max-height: 60svh; } }
+@media (prefers-reduced-motion: reduce) { .clock-colon { animation: none; opacity: .85; } }
+
+.timer-complete { position: absolute; right: 15%; bottom: 14%; margin: 0; padding: 6px 10px; border: 1px solid rgb(245 215 172 / 15%); border-radius: 7px; color: #f8e8d1; background: rgb(38 30 24 / 85%); font-size: 11px; pointer-events: none; }

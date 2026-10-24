@@ -3,10 +3,21 @@ import type { CSSProperties } from 'react';
 import { SceneArtwork } from './SceneArtwork.tsx';
 import { useMusic } from './useMusic.ts';
 import { useRoom } from './useRoom.ts';
+import { useFocusTimer } from './useFocusTimer.ts';
+import { ClockDisplay } from './ClockDisplay.tsx';
+import { TimerPanel } from './TimerPanel.tsx';
+import { formatTimer } from './timer.ts';
 
 export function App() {
   const room = useRoom();
   const music = useMusic();
+  const timer = useFocusTimer();
+  const [timerOpen, setTimerOpen] = useState(false);
+  const clockRef = useRef<SVGGElement>(null);
+  const closeTimer = useCallback((returnFocus = true) => {
+    setTimerOpen(false);
+    if (returnFocus) clockRef.current?.focus({ preventScroll: true });
+  }, []);
   const { state } = music;
   const [panelOpen, setPanelOpen] = useState(false);
   const radioRef = useRef<SVGGElement>(null);
@@ -23,6 +34,7 @@ export function App() {
     if (returnFocus) radioRef.current?.focus({ preventScroll: true });
   }, []);
   function openPanel() {
+    setTimerOpen(false);
     setPanelOpen(true);
     // An already open panel should also return focus to its main action.
     playRef.current?.focus({ preventScroll: true });
@@ -49,7 +61,10 @@ export function App() {
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
         <div className="scene" id="scene">
           <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt="Девушка в наушниках работает за ноутбуком у окна. За окном закат над городом и рекой. На столе — чашка, часы, радио и лампа." fetchPriority="high" width="1672" height="941" />
-          <SceneArtwork exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <ClockDisplay state={timer.state} />
+          <p className="timer-complete" hidden={timer.state.phase !== "finished"}>Время вышло</p>
+          <TimerPanel timer={timer} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />
+          <SceneArtwork clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">Радио LofLume</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>
@@ -79,6 +94,7 @@ export function App() {
         <div className="room-caption" id="room-caption"><h1>Home Work</h1><p className="eyebrow">Lofi · chill · focus</p></div>
         <button className="explore-button" id="explore" onClick={room.showLandmarks} type="button" aria-pressed={room.exploring} aria-controls="landmarks"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>Осмотреться</span></button>
       </footer>
+      <p className="sr-only" role="status" aria-live="polite">{timer.state.phase === "finished" ? "Время вышло" : ""}</p>
       <p id="status" className="sr-only" role="status" aria-live="polite">{room.status}</p>
       <div id="image-error" className="image-error" hidden={!room.imageError}><p>Не удалось открыть комнату.</p><button type="button" id="retry-image" onClick={room.retryImage}>Попробовать ещё раз</button></div>
     </main>
