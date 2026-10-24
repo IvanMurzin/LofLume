@@ -25,6 +25,17 @@ export function parseTimerDuration(hours: string, minutes: string): number | nul
   return parseMinutes(String(h * 60 + m));
 }
 
+export function clampTimerDuration(hours: string, minutes: string): { hours: string; minutes: string } {
+  const clampPart = (input: string, max: number) => {
+    const digits = input.replace(/\D/g, '').slice(0, 2);
+    if (!digits) return '';
+    return Number(digits) > max ? String(max).padStart(2, '0') : digits;
+  };
+  const h = clampPart(hours, 3);
+  const m = Number(h) === 3 ? '00' : clampPart(minutes, 59);
+  return { hours: h, minutes: m };
+}
+
 function syncTime(state: TimerState, now: number): TimerState {
   if (state.phase !== 'running' || state.deadline === null) return state;
   const remainingMs = Math.max(0, state.deadline - now);

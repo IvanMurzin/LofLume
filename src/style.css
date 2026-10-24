@@ -278,20 +278,14 @@ h1 {
 [data-object="timer"] { cursor: pointer; }
 @font-face { font-family: DSEG; src: url('/fonts/dseg7-classic-light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
 .timer-panel { right: 13%; bottom: 31%; width: 280px; padding: 18px 20px 20px; }
-.timer-editor, .timer-readout { display: flex; justify-content: center; align-items: flex-start; gap: 8px; margin-top: 24px; padding: 16px 0; border-block: 1px solid rgb(245 215 172 / 8%); }
-.timer-unit { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; }
+.timer-readout { display: flex; justify-content: center; align-items: flex-start; gap: 4px; margin-top: 24px; padding: 16px 0; border-block: 1px solid rgb(245 215 172 / 8%); }
+.timer-unit { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; flex: 1; }
 .timer-unit > span:last-child { font-size: 9px; letter-spacing: .6px; color: #b6a694; }
 .timer-unit input, .timer-number { font-family: DSEG, monospace; font-weight: 300; color: #f2ddb2; font-variant-numeric: tabular-nums; line-height: 1.4; }
-.timer-unit input { width: 82px; height: 56px; padding: 6px 0; border: 1px solid transparent; border-radius: 5px; background: transparent; font-size: 36px; text-align: center; caret-color: #f2ddb2; transition: background 160ms ease, border-color 160ms ease; }
-.timer-unit input:hover { background: rgb(245 215 172 / 5%); border-color: rgb(245 215 172 / 12%); }
+.timer-unit input { width: 100%; height: 56px; padding: 6px 0; border: 1px solid transparent; border-radius: 5px; background: transparent; font-size: 27px; text-align: center; caret-color: #f2ddb2; transition: background 160ms ease, border-color 160ms ease; }
+.timer-unit input:not([readonly]):hover { background: rgb(245 215 172 / 5%); border-color: rgb(245 215 172 / 12%); }
 .timer-unit input:focus-visible { outline: 1px solid rgb(245 215 172 / 40%); outline-offset: 1px; background: rgb(0 0 0 / 12%); }
-.timer-unit input[aria-invalid=true] { border-color: rgb(242 178 155 / 50%); }
-.timer-separator { font-family: DSEG, monospace; font-weight: 300; font-size: 30px; line-height: 56px; color: #c4ad88; }
-.timer-readout { gap: 4px; }
-.timer-readout .timer-number { font-size: 27px; height: 56px; display: grid; place-items: center; }
-.timer-readout .timer-unit { flex: 1; }
-.timer-readout .timer-separator { font-size: 22px; }
-.timer-error { font-size: 10px; color: #f2b29b; margin: 10px 0 0; line-height: 1.5; }
+.timer-separator { font-family: DSEG, monospace; font-weight: 300; font-size: 22px; line-height: 56px; color: #c4ad88; }
 .timer-actions { display: flex; gap: 10px; margin-top: 18px; }
 .timer-actions .music-play { display: flex; align-items: center; justify-content: center; gap: 9px; }
 .timer-actions svg { width: 18px; height: 18px; }
@@ -303,3 +297,11 @@ h1 {
 @media (prefers-reduced-motion: reduce) { .clock-colon { animation: none; opacity: .85; } }
 
 .timer-complete { position: absolute; right: 15%; bottom: 14%; margin: 0; padding: 6px 10px; border: 1px solid rgb(245 215 172 / 15%); border-radius: 7px; color: #f8e8d1; background: rgb(38 30 24 / 85%); font-size: 11px; pointer-events: none; }
+@media (max-height: 500px) and (orientation: landscape) {
+  .timer-panel { padding: 12px 16px; }
+  .timer-readout { margin-top: 10px; padding-block: 8px; }
+  .timer-unit { gap: 6px; }
+  .timer-unit input { height: 44px; font-size: 24px; }
+  .timer-separator { line-height: 44px; }
+  .timer-actions { margin-top: 12px; }
+}
