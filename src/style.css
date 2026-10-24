@@ -245,7 +245,7 @@ h1 {
 .ticker-copy { display: inline-flex; gap: 4px; white-space: nowrap; padding-right: 80px; font-size: 11px; line-height: 22px; }
 .ticker-artist { color: inherit; text-decoration-color: rgb(245 231 210 / 45%); text-underline-offset: 3px; }
 .ticker-artist:hover { text-decoration-color: currentColor; }
-.now-playing:hover .ticker-track, .now-playing:focus-within .ticker-track, :root[data-scene-paused] .ticker-track { animation-play-state: paused; }
+.now-playing:has(.ticker-artist:focus-visible) .ticker-track, :root[data-scene-paused] .ticker-track { animation-play-state: paused; }
 @keyframes radio-credit-scroll { to { transform: translateX(-50%); } }
 @media (max-width: 700px) and (orientation: portrait) { .now-playing { width: min(320px, calc(100vw - 44px)); } }
 @media (prefers-reduced-motion: reduce) {
