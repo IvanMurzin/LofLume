@@ -16,10 +16,11 @@ export function ClockDisplay({ state }: { state: TimerState }) {
   const count = minutes.length + seconds.length;
   const width = count * 25 + 10;
   const scale = Math.min(.85, 94 / width);
-  return <svg className="clock-display" viewBox="0 0 1672 941" aria-hidden="true" data-phase={state.phase}>
+  return <svg className="clock-display" viewBox="0 0 1671 941" aria-hidden="true" data-phase={state.phase}>
     <defs>
       <linearGradient id="clock-face" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#0d0b08"/><stop offset="1" stopColor="#0c0a07"/></linearGradient>
     </defs>
+    <g transform="translate(-27 0)">
     <path d="M1284 695 L1395 705 L1387 755 L1276 744Z" fill="url(#clock-face)"/>
     <g transform={`matrix(1 .1 -.14 1 ${1287 + (94 - width * scale) / 2} 704)`}>
       <g transform={`scale(${scale} .85)`} className="clock-digits">
@@ -29,6 +30,7 @@ export function ClockDisplay({ state }: { state: TimerState }) {
           return <g key={i} transform={`translate(${x} 0)`}>{segments.map((points, segment) => <path key={segment} d={points} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" opacity={digits[digit]!.includes(String(segment)) ? 1 : .045}/>)}</g>;
         })}
       </g>
+    </g>
     </g>
   </svg>;
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { publicAsset } from './assets.ts';
 import { SceneArtwork } from './SceneArtwork.tsx';
 import { useMusic } from './useMusic.ts';
 import { useRoom } from './useRoom.ts';
@@ -66,12 +67,12 @@ export function App() {
   return (
     <main className="room" aria-label="Домашняя комната для кодинга">
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
-        <div className="scene" id="scene">
-          <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt="Девушка в наушниках работает за ноутбуком у окна. За окном закат над городом и рекой. На столе — чашка, часы, радио и лампа." fetchPriority="high" width="1672" height="941" />
+        <div className="scene" id="scene" data-light={room.dimmed ? "dimmed" : "normal"}>
+          <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt="Девушка в наушниках работает за ноутбуком у окна. За окном закат над городом и рекой. На столе — стакан кофе, часы, радио и лампа." fetchPriority="high" width="1671" height="941" />
           <ClockDisplay state={timer.state} />
           <TimerNotice visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
           <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />
-          <SceneArtwork clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <SceneArtwork dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">Радио LofLume</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>
@@ -94,7 +95,7 @@ export function App() {
         </div>
       </div>
       <header className="room-header">
-        <span className="wordmark" aria-label="LofLume"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V8a7 7 0 0 1 14 0v11H5ZM12 2v17M5 11h14"/></svg>loflume</span>
+        <span className="wordmark" aria-label="LofLume"><img src={publicAsset("favicon.svg")} width="28" height="28" alt="" />loflume</span>
         <button className="icon-button" id="fullscreen" onClick={room.toggleFullscreen} hidden={!document.fullscreenEnabled} type="button" aria-label={fullscreenLabel} title={fullscreenLabel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button>
       </header>
       <footer className="room-footer">

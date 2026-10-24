@@ -53,7 +53,10 @@ button:focus-visible { outline: 2px solid #f7dfb5; outline-offset: 5px; }
   width: min(100cqw, calc(100cqh * var(--scene-ratio)));
   aspect-ratio: var(--scene-ratio);
 }
-.scene-image { display: block; width: 100%; height: 100%; object-fit: contain; }
+.scene-image { display: block; width: 100%; height: 100%; object-fit: contain; transition: filter 700ms ease; }
+.scene[data-light="dimmed"] .scene-image { filter: brightness(.68) saturate(.9); }
+.object-target[role="button"] { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .scene-image { transition: none; } }
 
 .scene-hud { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(100cqw, calc(100cqh * var(--scene-ratio))); aspect-ratio: var(--scene-ratio); pointer-events: none; }
 
@@ -79,16 +82,8 @@ button:focus-visible { outline: 2px solid #f7dfb5; outline-offset: 5px; }
   text-shadow: 0 1px 8px rgb(24 20 27 / 40%);
   user-select: none;
 }
-.wordmark > svg {
-  width: 21px;
-  height: 21px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.35;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: .85;
-}
+.wordmark > img { width: 28px; height: 28px; }
+
 button svg { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .icon-button {
   display: grid;
@@ -176,21 +171,6 @@ h1 {
 #pencil-arrow path { fill: none; stroke: #fff1d4; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 700px) and (orientation: portrait) { .annotation text { font-size: 54px; } .annotation-arrow { stroke-width: 2.6; } }
 @media (prefers-reduced-motion: reduce) { .object-shape { transition: none; } }
-
-/* Small independent loops; the accepted artwork and object coordinates never move. */
-.atmosphere { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
-.steam-wisp { fill: none; stroke: #fff1d8; stroke-width: 8; stroke-linecap: round; opacity: 0; animation: steam-rise 10s linear infinite; }
-.steam-wisp-one { animation-delay: -3s; }
-.steam-wisp-two { animation-delay: -7s; animation-duration: 12s; }
-.steam-wisp-three { animation-delay: -11s; animation-duration: 14s; stroke-width: 6; }
-@keyframes steam-rise {
-  0% { opacity: 0; transform: translate(0, 14px); }
-  22% { opacity: .40; }
-  58% { opacity: .30; }
-  100% { opacity: 0; transform: translate(7px, -25px); }
-}
-:root[data-scene-paused] .atmosphere * { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .atmosphere { display: none; } }
 
 .is-exploring .annotations { opacity: 1; visibility: visible; transition-delay: 0s; }
 @media (prefers-reduced-motion: reduce) { .annotations { transition: none; } }
@@ -308,7 +288,7 @@ h1 {
 .timer-unit input::selection { color: #fff0d2; background: rgb(245 215 172 / 22%); }
 .timer-unit input[readonly] { cursor: default; caret-color: transparent; }
 
-.timer-notice-slot { position: absolute; left: 80.2%; bottom: 29.5%; transform: translateX(-50%); z-index: 2; }
+.timer-notice-slot { position: absolute; left: 78.7%; bottom: 29.5%; transform: translateX(-50%); z-index: 2; }
 .timer-notice { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgb(255 235 206 / 12%); border-radius: 8px; background: rgb(30 25 23 / 62%); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #f1dbb7; white-space: nowrap; animation: timer-notice-in 280ms ease both; }
 .timer-notice:hover { border-color: rgb(235 203 151 / 35%); }
 .timer-notice-icon { display: grid; place-items: center; }

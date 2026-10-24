@@ -37,6 +37,7 @@
 - CLI: `./scripts/openspec`; status: `pnpm spec:list`; validation: `pnpm spec:validate`.
 - User guide and source references: `docs/WORKFLOW.md` (read for onboarding, not before every edit).
 - Application: React + TypeScript, plain CSS, Vite. Keep visual styling in the existing CSS; no UI kit is needed. Run `pnpm dev`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm preview`. `scripts/app` supports the bundled Codex Node runtime when node is absent from PATH.
-- Stages 1–2 are accepted: user-selected scene, timed handwritten discovery, silhouette hover and steam (no water shimmer). Stage 3 adds local CC0 music through the radio; the user explicitly authorized stage 4 clocks, now implemented; lamp and stage 4 acceptance remain.
+- Stages 1–2 are accepted: user-selected scene, timed handwritten discovery and silhouette hover. The current v5 artwork has a lidded coffee cup, so steam has been removed; keep the clock colon animation. Stage 3 adds local CC0 music through the radio; the user explicitly authorized stage 4 clocks, now implemented; lamp is implemented, product acceptance remains.
+- Current scene: user-provided `public/assets/cozy-coding-v5.webp`; source and provenance in `docs/assets/cozy-coding-v5.md`. Future object ideas live in `docs/IDEAS.md`; do not implement them merely because they are pictured.
 - React components live in `src/App.tsx` and `src/SceneArtwork.tsx`; `useRoom` and `useMusic` own browser subscriptions with cleanup. Keep `src/music.ts` independent of React. Compare browser screenshots when changing the render tree.
 - `pnpm test` runs focused music and timer state/failure regression tests with Node type stripping. No lint command exists. Do browser QA for visual changes.

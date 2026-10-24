@@ -1,4 +1,4 @@
-// A short original two-note chime. Master volume follows the radio; the voice
+// Three soft two-note phrases. Master volume follows the radio; the voice
 // envelopes keep the tone soft and avoid clicks at either end.
 export class TimerChime {
   private context: AudioContext | null = null;
@@ -22,27 +22,30 @@ export class TimerChime {
     if (!context || !master || context.state !== 'running') return;
     this.cancel();
     master.gain.setValueAtTime(Math.max(0, Math.min(1, volume)), context.currentTime);
-    for (const [offset, frequency] of [[0, 523.25], [.22, 659.25]] as const) {
-      for (const [harmonic, level] of [[1, .18], [2, .022]] as const) {
-        const oscillator = context.createOscillator();
-        const envelope = context.createGain();
-        const start = context.currentTime + offset;
-        oscillator.type = 'sine';
-        oscillator.frequency.value = frequency * harmonic;
-        envelope.gain.setValueAtTime(0, start);
-        envelope.gain.linearRampToValueAtTime(level, start + .012);
-        envelope.gain.exponentialRampToValueAtTime(.0001, start + .82);
-        envelope.gain.linearRampToValueAtTime(0, start + .9);
-        oscillator.connect(envelope);
-        envelope.connect(master);
-        this.voices.add(oscillator);
-        oscillator.onended = () => {
-          this.voices.delete(oscillator);
-          oscillator.disconnect();
-          envelope.disconnect();
-        };
-        oscillator.start(start);
-        oscillator.stop(start + .9);
+    const startedAt = context.currentTime;
+    for (let repeat = 0; repeat < 3; repeat++) {
+      for (const [offset, frequency] of [[0, 523.25], [.22, 659.25]] as const) {
+        for (const [harmonic, level] of [[1, .36], [2, .044]] as const) {
+          const oscillator = context.createOscillator();
+          const envelope = context.createGain();
+          const start = startedAt + repeat * 1.4 + offset;
+          oscillator.type = 'sine';
+          oscillator.frequency.value = frequency * harmonic;
+          envelope.gain.setValueAtTime(0, start);
+          envelope.gain.linearRampToValueAtTime(level, start + .012);
+          envelope.gain.exponentialRampToValueAtTime(.0001, start + .82);
+          envelope.gain.linearRampToValueAtTime(0, start + .9);
+          oscillator.connect(envelope);
+          envelope.connect(master);
+          this.voices.add(oscillator);
+          oscillator.onended = () => {
+            this.voices.delete(oscillator);
+            oscillator.disconnect();
+            envelope.disconnect();
+          };
+          oscillator.start(start);
+          oscillator.stop(start + .9);
+        }
       }
     }
   }
