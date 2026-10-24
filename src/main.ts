@@ -34,7 +34,7 @@ document.addEventListener('keydown', (event) => {
 
 function updateSceneRatio(): void {
   if (image.naturalWidth && image.naturalHeight) {
-    scene.style.setProperty('--scene-ratio', String(image.naturalWidth / image.naturalHeight));
+    scene.parentElement!.style.setProperty('--scene-ratio', String(image.naturalWidth / image.naturalHeight));
   }
   imageError.hidden = true;
 }
