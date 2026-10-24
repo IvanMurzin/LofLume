@@ -1,10 +1,11 @@
 import { useEffect, useReducer, useState } from 'react';
-import { createTimer, parseMinutes, timerReducer } from './timer.ts';
+import { createTimer, parseTimerDuration, timerReducer } from './timer.ts';
 
 export function useFocusTimer() {
   const [state, dispatch] = useReducer(timerReducer, undefined, createTimer);
-  const [input, setInput] = useState('25');
-  const minutes = parseMinutes(input);
+  const [hours, setHours] = useState('00');
+  const [minutePart, setMinutePart] = useState('25');
+  const minutes = parseTimerDuration(hours, minutePart);
   useEffect(() => {
     if (state.phase !== 'running') return;
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -24,7 +25,7 @@ export function useFocusTimer() {
     };
   }, [state.phase]);
   return {
-    state, input, setInput, valid: minutes !== null,
+    state, hours, setHours, minutePart, setMinutePart, valid: minutes !== null,
     toggle() {
       const now = Date.now();
       if (state.phase === 'running') dispatch({ type: 'pause', now });

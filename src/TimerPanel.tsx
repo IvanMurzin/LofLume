@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { useFocusTimer } from './useFocusTimer.ts';
 
@@ -8,6 +8,8 @@ export function TimerPanel({ timer, open, clockRef, onClose }: Props) {
   const playRef = useRef<HTMLButtonElement>(null);
   const { phase } = timer.state;
   const locked = phase === 'running' || phase === 'paused';
+  const totalSeconds = Math.ceil(timer.state.remainingMs / 1000);
+  const readout = [Math.floor(totalSeconds / 3600), Math.floor(totalSeconds / 60) % 60, totalSeconds % 60].map(value => String(value).padStart(2, '0'));
   useEffect(() => {
     if (!open) return;
     playRef.current?.focus({ preventScroll: true });
@@ -26,10 +28,15 @@ export function TimerPanel({ timer, open, clockRef, onClose }: Props) {
   return <section className="music-panel timer-panel" id="timer-panel" ref={panelRef} role="dialog" aria-modal="false" aria-labelledby="timer-heading" hidden={!open}>
     <header className="music-panel-heading"><span id="timer-heading">Таймер</span><button className="music-close" id="timer-close" onClick={() => onClose()} type="button" aria-label="Закрыть таймер"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
     <form onSubmit={event => { event.preventDefault(); timer.toggle(); }}>
-      <label className="timer-duration" htmlFor="timer-minutes"><span>Длительность, мин</span><input id="timer-minutes" type="number" inputMode="numeric" min="1" max="180" step="1" value={timer.input} disabled={locked} aria-invalid={!timer.valid} aria-describedby={!timer.valid ? 'timer-error' : undefined} onChange={event => timer.setInput(event.target.value)} /></label>
-      <p className="timer-error" id="timer-error" hidden={timer.valid}>От 1 до 180 целых минут.</p>
-      <div className="timer-actions"><button className="music-play" id="timer-toggle" ref={playRef} type="submit" disabled={!locked && !timer.valid}>{phase === 'running' ? 'Пауза' : phase === 'paused' ? 'Продолжить' : phase === 'finished' ? 'Ещё раз' : 'Старт'}</button><button className="timer-reset" id="timer-reset" type="button" onClick={timer.reset} disabled={phase === 'idle'}>Сбросить</button></div>
-      <p className="timer-phase" hidden={phase !== 'paused' && phase !== 'finished'}>{phase === 'finished' ? 'Время вышло' : 'На паузе'}</p>
+      {phase === 'idle' ? <div className="timer-editor" role="group" aria-label="Длительность таймера">
+        <label className="timer-unit"><input id="timer-hours" aria-label="Часы" type="text" inputMode="numeric" pattern="[0-9]{1,2}" maxLength={2} value={timer.hours} aria-invalid={!timer.valid} aria-describedby={!timer.valid ? 'timer-error' : undefined} onFocus={event => event.target.select()} onBlur={() => { if (/^\d{1,2}$/.test(timer.hours)) timer.setHours(timer.hours.padStart(2, '0')); }} onChange={event => timer.setHours(event.target.value)} /><span>часы</span></label>
+        <span className="timer-separator" aria-hidden="true">:</span>
+        <label className="timer-unit"><input id="timer-minutes" aria-label="Минуты" type="text" inputMode="numeric" pattern="[0-9]{1,2}" maxLength={2} value={timer.minutePart} aria-invalid={!timer.valid} aria-describedby={!timer.valid ? 'timer-error' : undefined} onFocus={event => event.target.select()} onBlur={() => { if (/^\d{1,2}$/.test(timer.minutePart)) timer.setMinutePart(timer.minutePart.padStart(2, '0')); }} onChange={event => timer.setMinutePart(event.target.value)} /><span>минуты</span></label>
+      </div> : <div className="timer-readout" role="timer" aria-label={readout.join(':')}>
+        {readout.map((value, index) => <Fragment key={index}>{index > 0 && <span className="timer-separator" aria-hidden="true">:</span>}<span className="timer-unit"><span className="timer-number">{value}</span><span>{['часы', 'минуты', 'секунды'][index]}</span></span></Fragment>)}
+      </div>}
+      <p className="timer-error" id="timer-error" hidden={phase !== 'idle' || timer.valid}>От 00:01 до 03:00, минуты — до 59.</p>
+      <div className="timer-actions"><button className="music-play" id="timer-toggle" ref={playRef} type="submit" disabled={!locked && !timer.valid}><svg viewBox="0 0 20 20" aria-hidden="true">{phase === 'running' ? <path d="M7 5v10M13 5v10"/> : <path d="m7 4 9 6-9 6Z"/>}</svg>{phase === 'running' ? 'Пауза' : phase === 'paused' ? 'Продолжить' : phase === 'finished' ? 'Ещё раз' : 'Старт'}</button><button className="timer-reset" id="timer-reset" type="button" onClick={timer.reset} disabled={phase === 'idle'} aria-label="Сбросить таймер" title="Сбросить"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 8a6 6 0 1 1 0 5M4 3v5h5"/></svg></button></div>
     </form>
   </section>;
 }

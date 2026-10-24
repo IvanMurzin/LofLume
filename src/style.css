@@ -272,22 +272,32 @@ h1 {
 /* Live clock face stays in the same coordinates as its case and hover shape. */
 .clock-display { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .clock-digits { fill: #f4e5ad; color: #f4e5ad; filter: drop-shadow(0 0 1.2px rgb(245 219 149 / 24%)); }
-.clock-colon { animation: clock-breathe 3.6s ease-in-out infinite; }
+.clock-colon { animation: clock-breathe 2.4s ease-in-out infinite; }
 @keyframes clock-breathe { 0%, 100% { opacity: .95; } 50% { opacity: .3; } }
 :root[data-scene-paused] .clock-colon { animation-play-state: paused; }
 [data-object="timer"] { cursor: pointer; }
-.timer-panel { right: 13%; bottom: 31%; width: 260px; }
-.timer-duration { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 22px; color: #d0bfac; }
-.timer-duration input { width: 76px; padding: 8px; border: 1px solid rgb(245 215 172 / 24%); border-radius: 6px; background: rgb(0 0 0 / 15%); color: #f8e8d1; font: inherit; font-size: 16px; text-align: center; }
-.timer-duration input:focus-visible { outline: 2px solid #f7dfb5; outline-offset: 2px; }
-.timer-duration input:disabled { opacity: .6; }
-.timer-duration input[aria-invalid=true] { border-color: #f2b29b; }
-.timer-error { font-size: 10px; color: #f2b29b; margin: 8px 0 0; }
-.timer-actions { display: flex; gap: 8px; margin-top: 20px; }
-.timer-reset { padding: 10px; border: 1px solid rgb(245 215 172 / 20%); border-radius: 8px; font-size: 11px; background: transparent; }
+@font-face { font-family: DSEG; src: url('/fonts/dseg7-classic-light.woff2') format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+.timer-panel { right: 13%; bottom: 31%; width: 280px; padding: 18px 20px 20px; }
+.timer-editor, .timer-readout { display: flex; justify-content: center; align-items: flex-start; gap: 8px; margin-top: 24px; padding: 16px 0; border-block: 1px solid rgb(245 215 172 / 8%); }
+.timer-unit { display: flex; flex-direction: column; align-items: center; gap: 12px; min-width: 0; }
+.timer-unit > span:last-child { font-size: 9px; letter-spacing: .6px; color: #b6a694; }
+.timer-unit input, .timer-number { font-family: DSEG, monospace; font-weight: 300; color: #f2ddb2; font-variant-numeric: tabular-nums; line-height: 1.4; }
+.timer-unit input { width: 82px; height: 56px; padding: 6px 0; border: 1px solid transparent; border-radius: 5px; background: transparent; font-size: 36px; text-align: center; caret-color: #f2ddb2; transition: background 160ms ease, border-color 160ms ease; }
+.timer-unit input:hover { background: rgb(245 215 172 / 5%); border-color: rgb(245 215 172 / 12%); }
+.timer-unit input:focus-visible { outline: 1px solid rgb(245 215 172 / 40%); outline-offset: 1px; background: rgb(0 0 0 / 12%); }
+.timer-unit input[aria-invalid=true] { border-color: rgb(242 178 155 / 50%); }
+.timer-separator { font-family: DSEG, monospace; font-weight: 300; font-size: 30px; line-height: 56px; color: #c4ad88; }
+.timer-readout { gap: 4px; }
+.timer-readout .timer-number { font-size: 27px; height: 56px; display: grid; place-items: center; }
+.timer-readout .timer-unit { flex: 1; }
+.timer-readout .timer-separator { font-size: 22px; }
+.timer-error { font-size: 10px; color: #f2b29b; margin: 10px 0 0; line-height: 1.5; }
+.timer-actions { display: flex; gap: 10px; margin-top: 18px; }
+.timer-actions .music-play { display: flex; align-items: center; justify-content: center; gap: 9px; }
+.timer-actions svg { width: 18px; height: 18px; }
+.timer-reset { display: grid; place-items: center; flex: 0 0 40px; border: 1px solid rgb(245 215 172 / 18%); border-radius: 8px; background: transparent; color: #d0bfac; }
 .timer-reset:hover:enabled { background: rgb(245 215 172 / 7%); }
 .timer-actions button:disabled { cursor: default; opacity: .4; }
-.timer-phase { margin: 12px 0 0; color: #d0bfac; font-size: 11px; }
 @media (max-width: 700px) and (orientation: portrait) { .timer-panel { right: 16px; bottom: 31%; } }
 @media (max-height: 500px) and (orientation: landscape) { .timer-panel { right: 13%; bottom: 15%; max-height: 60svh; } }
 @media (prefers-reduced-motion: reduce) { .clock-colon { animation: none; opacity: .85; } }

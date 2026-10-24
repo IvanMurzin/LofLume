@@ -48,3 +48,9 @@ test('formatting rounds up fractional seconds and supports all allowed durations
   assert.equal(formatTimer(60001), '01:01'); assert.equal(formatTimer(-100), '00:00');
   assert.equal(formatTimer(10800000), '180:00');
 });
+
+test('hour/minute editor validates components and total session duration', async () => {
+  const { parseTimerDuration } = await import('../src/timer.ts');
+  for (const [hours,minutes,total] of [['00','01',1],['00','25',25],['01','30',90],['02','59',179],['03','00',180]]) assert.equal(parseTimerDuration(hours,minutes),total);
+  for (const [hours,minutes] of [['','25'],['00',''],['00','00'],['00','60'],['03','01'],['04','00'],['-1','30'],['1.5','00'],['0','1e'],['a','25']]) assert.equal(parseTimerDuration(hours,minutes),null);
+});

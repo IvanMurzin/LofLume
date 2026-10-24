@@ -18,6 +18,13 @@ export function parseMinutes(input: string): number | null {
   return Number.isInteger(minutes) && minutes >= 1 && minutes <= 180 ? minutes : null;
 }
 
+export function parseTimerDuration(hours: string, minutes: string): number | null {
+  if (!/^\d{1,2}$/.test(hours) || !/^\d{1,2}$/.test(minutes)) return null;
+  const h = Number(hours), m = Number(minutes);
+  if (h > 3 || m > 59) return null;
+  return parseMinutes(String(h * 60 + m));
+}
+
 function syncTime(state: TimerState, now: number): TimerState {
   if (state.phase !== 'running' || state.deadline === null) return state;
   const remainingMs = Math.max(0, state.deadline - now);
