@@ -36,6 +36,7 @@
 - Node.js >=22.12; pnpm 11.25.0. Restore: `pnpm install --frozen-lockfile`.
 - CLI: `./scripts/openspec`; status: `pnpm spec:list`; validation: `pnpm spec:validate`.
 - User guide and source references: `docs/WORKFLOW.md` (read for onboarding, not before every edit).
-- Application: native TypeScript/CSS, Vite. Run `pnpm dev`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm preview`. `scripts/app` supports the bundled Codex Node runtime when node is absent from PATH.
+- Application: React + TypeScript, plain CSS, Vite. Keep visual styling in the existing CSS; no UI kit is needed. Run `pnpm dev`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm preview`. `scripts/app` supports the bundled Codex Node runtime when node is absent from PATH.
 - Stages 1–2 are accepted: user-selected scene, timed handwritten discovery, silhouette hover and steam (no water shimmer). Stage 3 adds local CC0 music through the radio; wait for product listening feedback before stage 4.
+- React components live in `src/App.tsx` and `src/SceneArtwork.tsx`; `useRoom` and `useMusic` own browser subscriptions with cleanup. Keep `src/music.ts` independent of React. Compare browser screenshots when changing the render tree.
 - `pnpm test` runs focused music state and failure regression tests with Node type stripping. No lint command exists. Do browser QA for visual changes.
