@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { publicAsset } from './assets.ts';
 
 export function useRoom() {
   const [exploring, setExploring] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [status, setStatus] = useState('');
   const [imageError, setImageError] = useState(false);
-  const [imageSrc, setImageSrc] = useState('/assets/cozy-coding-v3.webp');
+  const [imageSrc, setImageSrc] = useState(publicAsset('assets/cozy-coding-v3.webp'));
   const [ratio, setRatio] = useState(1672 / 941);
   const imageRef = useRef<HTMLImageElement>(null);
   const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -49,7 +50,7 @@ export function useRoom() {
   return {
     exploring, fullscreen, status, imageError, imageSrc, ratio, imageRef, imageLoaded,
     imageFailed() { setImageError(true); },
-    retryImage() { setImageError(false); setImageSrc(`/assets/cozy-coding-v3.webp?retry=${Date.now()}`); },
+    retryImage() { setImageError(false); setImageSrc(`${publicAsset('assets/cozy-coding-v3.webp')}?retry=${Date.now()}`); },
     showLandmarks() {
       clearTimeout(timeout.current);
       setExploring(true);

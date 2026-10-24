@@ -1,10 +1,11 @@
 import type { Track } from './music.ts';
+import { publicAsset } from './assets.ts';
 
 export const tracks: readonly Track[] = [
   {
     "id": "city-in-the-rearview",
     "title": "City In The Rearview",
-    "url": "/audio/city-in-the-rearview.mp3",
+    "url": publicAsset("audio/city-in-the-rearview.mp3"),
     "artist": "Holizna",
     "artistUrl": "https://opengameart.org/users/holizna",
     "source": "https://opengameart.org/content/chill-beats-collection",
@@ -13,7 +14,7 @@ export const tracks: readonly Track[] = [
   {
     "id": "autumn",
     "title": "Autumn",
-    "url": "/audio/autumn.mp3",
+    "url": publicAsset("audio/autumn.mp3"),
     "artist": "Holizna",
     "artistUrl": "https://opengameart.org/users/holizna",
     "source": "https://opengameart.org/content/chill-beats-collection",
@@ -22,7 +23,7 @@ export const tracks: readonly Track[] = [
   {
     "id": "families",
     "title": "Families",
-    "url": "/audio/families.mp3",
+    "url": publicAsset("audio/families.mp3"),
     "artist": "Holizna",
     "artistUrl": "https://opengameart.org/users/holizna",
     "source": "https://opengameart.org/content/chill-beats-collection",
@@ -31,7 +32,7 @@ export const tracks: readonly Track[] = [
   {
     "id": "opinions",
     "title": "Opinions",
-    "url": "/audio/opinions.mp3",
+    "url": publicAsset("audio/opinions.mp3"),
     "artist": "Holizna",
     "artistUrl": "https://opengameart.org/users/holizna",
     "source": "https://opengameart.org/content/chill-beats-collection",
@@ -40,7 +41,7 @@ export const tracks: readonly Track[] = [
   {
     "id": "old-age",
     "title": "Old Age",
-    "url": "/audio/old-age.mp3",
+    "url": publicAsset("audio/old-age.mp3"),
     "artist": "Holizna",
     "artistUrl": "https://opengameart.org/users/holizna",
     "source": "https://opengameart.org/content/chill-beats-collection",
@@ -49,7 +50,7 @@ export const tracks: readonly Track[] = [
   {
     "id": "dream-pop",
     "title": "Dream Pop",
-    "url": "/audio/dream-pop.mp3",
+    "url": publicAsset("audio/dream-pop.mp3"),
     "artist": "Holizna",
     "artistUrl": "https://opengameart.org/users/holizna",
     "source": "https://opengameart.org/content/chill-beats-collection",
