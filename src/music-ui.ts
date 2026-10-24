@@ -13,7 +13,10 @@ export function initMusic(): () => void {
   const volume = document.querySelector<HTMLInputElement>('#music-volume')!;
   const volumeValue = document.querySelector<HTMLOutputElement>('#music-volume-value')!;
   const nowPlaying = document.querySelector<HTMLElement>('#now-playing')!;
-  const roomCaption = document.querySelector<HTMLElement>('#room-caption')!;
+  const quickToggle = document.querySelector<HTMLButtonElement>('#radio-toggle')!;
+  const quickIcon = document.querySelector<SVGPathElement>('#radio-toggle-icon')!;
+  const ticker = nowPlaying.querySelector<HTMLElement>('.ticker-viewport')!;
+  const radioStatus = document.querySelector<HTMLElement>('#radio-status')!;
   let displayedTrack = '';
   let savedVolume = .45;
   try {
@@ -26,8 +29,14 @@ export function initMusic(): () => void {
     title.textContent = state.track.title;
     artist.textContent = state.track.artist;
     const playing = state.phase === 'playing';
-    nowPlaying.hidden = !playing;
-    roomCaption.hidden = playing;
+    const active = playing || state.phase === 'loading';
+    nowPlaying.hidden = state.phase === 'idle';
+    ticker.hidden = !playing;
+    radioStatus.hidden = playing;
+    radioStatus.textContent = state.phase === 'loading' ? 'Загрузка…' : state.phase === 'error' ? 'Повторить запуск' : 'Радио на паузе';
+    quickToggle.setAttribute('aria-label', state.phase === 'error' ? 'Повторить запуск музыки' : active ? 'Пауза' : 'Включить музыку');
+    quickToggle.title = quickToggle.getAttribute('aria-label')!;
+    quickIcon.setAttribute('d', active ? 'M7 5v10M13 5v10' : 'M7 4l9 6-9 6Z');
     if (displayedTrack !== state.track.id) {
       displayedTrack = state.track.id;
       for (const name of nowPlaying.querySelectorAll('.ticker-title')) name.textContent = state.track.title;
@@ -35,9 +44,8 @@ export function initMusic(): () => void {
         link.textContent = state.track.artist;
         link.href = state.track.artistUrl ?? state.track.source;
       }
-      nowPlaying.setAttribute('aria-label', 'Сейчас играет: ' + state.track.title + ' — ' + state.track.artist);
     }
-    const active = state.phase === 'playing' || state.phase === 'loading';
+    nowPlaying.setAttribute('aria-label', playing ? 'Сейчас играет: ' + state.track.title + ' — ' + state.track.artist : 'Радио LofLume');
     play.textContent = state.phase === 'error' ? 'Попробовать ещё раз' : active ? 'Пауза' : 'Включить';
     play.setAttribute('aria-label', state.phase === 'error' ? 'Повторить запуск музыки' : active ? 'Пауза' : 'Включить музыку');
     panel.dataset.phase = state.phase;
@@ -72,6 +80,7 @@ export function initMusic(): () => void {
     if (target instanceof Node && !panel.contains(target) && !radio.contains(target)) closePanel(false);
   });
   play.addEventListener('click', () => player.toggle());
+  quickToggle.addEventListener('click', () => player.toggle());
   volume.addEventListener('input', () => {
     player.setVolume(Number(volume.value) / 100);
     try { localStorage.setItem('loflume.music.volume', String(player.state.volume)); } catch { /* Optional. */ }

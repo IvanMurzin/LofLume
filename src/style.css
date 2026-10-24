@@ -93,6 +93,7 @@ button svg { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap
 .icon-button:hover { background: rgb(30 26 32 / 48%); }
 
 .room-footer { bottom: 0; align-items: flex-end; padding: 28px 38px 32px; }
+.footer-left { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .room-caption p { margin: 0; }
 .eyebrow { font-size: 11px; font-weight: 400; letter-spacing: .2px; color: rgb(247 238 223 / 70%); }
 h1 {
@@ -218,8 +219,27 @@ h1 {
 @media (max-width: 700px) and (orientation: portrait) { .music-panel { right: 16px; bottom: 18%; } }
 @media (max-height: 500px) and (orientation: landscape) { .music-panel { bottom: 12%; max-height: 80svh; padding: 12px 16px; } }
 
-.now-playing { display: flex; align-items: center; gap: 9px; width: min(260px, 42vw); max-width: calc(100vw - 44px); min-width: 0; pointer-events: auto; color: #f5e7d2; text-shadow: 0 1px 5px #38261e; }
-.now-playing-note { width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; }
+.now-playing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(300px, 42vw);
+  max-width: calc(100vw - 44px);
+  min-width: 0;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid rgb(255 235 206 / 12%);
+  border-radius: 10px;
+  background: rgb(30 25 23 / 62%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+  color: #f5e7d2;
+}
+.radio-toggle { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 6px; background: transparent; }
+.radio-toggle:hover { background: rgb(255 235 206 / 12%); }
+.radio-toggle:focus-visible { outline-offset: 0; }
+.radio-toggle svg { width: 20px; height: 20px; stroke-width: 1.7; }
+.radio-status { font-size: 11px; line-height: 22px; color: rgb(245 231 210 / 75%); }
 .ticker-viewport { overflow: hidden; min-width: 0; flex: 1; mask-image: linear-gradient(90deg, transparent, black 8px, black calc(100% - 8px), transparent); }
 .ticker-track { display: flex; width: max-content; animation: radio-credit-scroll 24s linear infinite; }
 .ticker-copy { display: inline-flex; gap: 4px; white-space: nowrap; padding-right: 80px; font-size: 11px; line-height: 22px; }
