@@ -1,8 +1,8 @@
 import type { RefObject } from "react";
 
-type Props = { dimmed: boolean; onToggleLight: () => void; exploring: boolean; playing: boolean; panelOpen: boolean; radioRef: RefObject<SVGGElement | null>; onOpenRadio: () => void; clockRef: RefObject<SVGGElement | null>; timerOpen: boolean; timerLabel: string; onOpenTimer: () => void };
+type Props = { cassetteRef: RefObject<SVGGElement | null>; cassetteOpen: boolean; onOpenCassettes: () => void; dimmed: boolean; onToggleLight: () => void; exploring: boolean; playing: boolean; panelOpen: boolean; radioRef: RefObject<SVGGElement | null>; onOpenRadio: () => void; clockRef: RefObject<SVGGElement | null>; timerOpen: boolean; timerLabel: string; onOpenTimer: () => void };
 
-export function SceneArtwork({ dimmed, onToggleLight, exploring, playing, panelOpen, radioRef, onOpenRadio, clockRef, timerOpen, timerLabel, onOpenTimer }: Props) {
+export function SceneArtwork({ cassetteRef, cassetteOpen, onOpenCassettes, dimmed, onToggleLight, exploring, playing, panelOpen, radioRef, onOpenRadio, clockRef, timerOpen, timerLabel, onOpenTimer }: Props) {
   return <>
           <svg className={exploring ? "room-objects is-exploring" : "room-objects"} id="room-objects" viewBox="0 0 1671 941" aria-label="Предметы в комнате">
             <defs>
@@ -17,7 +17,9 @@ export function SceneArtwork({ dimmed, onToggleLight, exploring, playing, panelO
             <g transform="translate(-35 4)" className="object-target" data-object="light" tabIndex={0} role="button" aria-label="Приглушить свет" aria-pressed={dimmed} onClick={onToggleLight} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onToggleLight(); } }}>
               <path className="object-shape" d="M1487 304 C1447 305 1413 333 1393 371 Q1385 382 1403 391 C1440 413 1501 432 1540 433 Q1556 435 1557 421 C1567 372 1546 323 1518 311 Q1504 306 1487 304 Z"/>
             </g>
+            <g ref={cassetteRef} className="object-target" data-object="cassettes" tabIndex={0} role="button" aria-label="Кассеты — свои подборки" aria-haspopup="dialog" aria-expanded={cassetteOpen} aria-controls="cassette-panel" onClick={onOpenCassettes} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onOpenCassettes(); } }}><path className="object-shape" d="M206 342 L228 337 L302 345 L307 454 L204 454 Z"/></g>
             <g className="annotations" id="landmarks" aria-hidden="true">
+              <g className="annotation"><text x="320" y="305" transform="rotate(-6 320 305)">кассеты</text><path className="annotation-arrow" d="M359 315 Q328 320 300 357"/></g>
               <g className="annotation"><text x="1170" y="855" transform="rotate(-7 1170 855)">часы</text><path className="annotation-arrow" d="M1233 826 Q1250 816 1260 784"/></g>
               <g className="annotation"><text x="1478" y="862" transform="rotate(5 1478 862)">радио</text><path className="annotation-arrow" d="M1533 829 Q1555 813 1544 783"/></g>
               <g className="annotation"><text x="1195" y="250" transform="rotate(-6 1195 250)">лампа</text><path className="annotation-arrow" d="M1283 256 Q1330 235 1397 333"/></g>

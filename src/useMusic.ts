@@ -28,6 +28,7 @@ export function useMusic() {
   return {
     audioRef, state,
     toggle() { playerRef.current?.toggle(); },
+    pause() { playerRef.current?.pause(); },
     setVolume(value: number) {
       const player = playerRef.current;
       if (!player) return;

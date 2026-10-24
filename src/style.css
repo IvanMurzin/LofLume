@@ -310,3 +310,65 @@ h1 {
 @media (max-width: 700px) and (orientation: portrait) {
   .scene:has(#timer-panel:not([hidden])) .timer-notice-slot { visibility: hidden; }
 }
+
+/* A small case on the shelf, and the radio's pull-out screen. */
+.cassette-panel { position: absolute; left: 24px; top: 12%; width: 300px; max-width: calc(100vw - 32px); max-height: calc(100svh - 172px); overflow-y: auto; padding: 16px; border: 1px solid rgb(245 215 172 / 22%); border-radius: 12px; background: #302823; box-shadow: 0 12px 40px rgb(29 19 15 / 32%); pointer-events: auto; z-index: 6; }
+.cassette-slots { display: grid; gap: 10px; margin: 16px 0 10px; }
+.cassette-slot { position: relative; display: block; width: 100%; aspect-ratio: 260/76; padding: 0; border: 0; background: none; color: #d0aa7e; text-align: left; }
+.cassette-slot > svg { display: block; width: 100%; height: 100%; fill: #211e1b; stroke: #8e7359; stroke-width: 1; }
+.cassette-slot > svg rect:nth-child(3) { fill: #cbb693; stroke: #cbb693; }
+.cassette-slot.is-selected > svg, .cassette-slot:hover > svg { stroke: #e4c18b; filter: drop-shadow(0 0 4px rgb(226 185 123 / 18%)); }
+.cassette-number { position: absolute; top: 15%; left: 10%; font-size: 11px; font-weight: 700; color: #45372b; }
+.cassette-name { position: absolute; top: 10%; left: 23%; right: 10%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Caveat, cursive; font-size: 22px; line-height: 1.1; color: #382d25; }
+.cassette-service { position: absolute; top: 39%; left: 24%; right: 8%; font-size: 8px; color: #514235; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tape-color-1 > svg rect:nth-child(3) { fill: #b6ba9b; stroke: #b6ba9b; }
+.tape-color-2 > svg rect:nth-child(3) { fill: #bca4a1; stroke: #bca4a1; }
+.cassette-actions { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+.tape-link-button { padding: 5px 0; border: 0; background: none; color: #d4bfa4; font-size: 11px; }
+.tape-link-button:hover { color: #fff0d5; }
+.cassette-storage { margin: 14px 0 0; color: #b9a58e; font-size: 10px; line-height: 1.5; }
+.cassette-editor { margin-top: 20px; }
+.cassette-editor label { display: block; margin: 15px 0 7px; font-size: 11px; color: #d3bea5; }
+.cassette-editor input { width: 100%; min-height: 39px; padding: 10px; border: 1px solid #75604c; border-radius: 6px; background: #241e1a; color: #f7e5cc; font: inherit; font-size: 12px; }
+.cassette-editor input:focus-visible { outline: 1px solid #dfbf90; outline-offset: 2px; }
+.cassette-editor input[aria-invalid=true] { border-color: #d8997e; }
+.cassette-editor input::selection { background: #75604c; }
+.cassette-error { color: #ebba9c; font-size: 10px; line-height: 1.5; }
+.cassette-indicator { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cassette-indicator rect { fill: #171611; stroke: #71624a; stroke-width: .6; }
+.cassette-indicator text { fill: #d5c499; font: 11px monospace; letter-spacing: 1px; }
+.tape-led { fill: #a98a53; opacity: .65; }
+.tape-led.is-playing { fill: #dfbc79; opacity: 1; }
+.external-screen { position: absolute; right: 18px; bottom: 36%; width: 320px; max-width: calc(100vw - 32px); padding: 6px; border: 1px solid #78634c; border-radius: 9px; background: #211c18; box-shadow: 0 8px 30px rgb(21 13 8 / 40%); pointer-events: auto; z-index: 4; animation: screen-slide-in 240ms ease both; }
+.external-screen-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 27px; padding: 0 4px 5px; font: 10px monospace; color: #d7bb93; }
+.external-screen-heading > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.external-screen-name { font-family: Caveat, cursive; font-size: 17px; }
+.external-screen-heading button { flex-shrink: 0; padding: 4px; border: 0; background: transparent; font-size: 10px; color: #d8c5ac; }
+.external-screen-heading button:hover { color: #fff0d5; }
+.external-player-host, .external-frame { display: block; width: 100%; height: 200px; min-width: 200px; min-height: 200px; border: 0; background: #151310; }
+.external-player-host iframe { display: block; width: 100%; height: 200px; min-height: 200px; border: 0; }
+.external-screen-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 23px; padding: 6px 4px 0; color: #b9a58e; font-size: 9px; }
+.external-screen-footer a { color: inherit; text-underline-offset: 2px; }
+.external-screen-footer button { padding: 0; border: 0; color: #e3c397; background: transparent; font-size: 10px; }
+.external-error { margin: 6px 4px 2px; font-size: 10px; line-height: 1.4; color: #e5b794; }
+@keyframes screen-slide-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 701px) and (max-width: 1200px) { .room:has(.external-screen) .timer-panel { right: calc(38% + 16px); } }
+@media (max-width: 700px) and (orientation: portrait) {
+  .external-screen { position: absolute; top: 12px; right: 16px; bottom: auto; }
+  .cassette-panel { position: absolute; top: auto; left: 16px; bottom: 17px; max-height: calc(100svh - 405px); }
+  .room:has(.external-screen) .timer-panel { position: absolute; right: 16px; bottom: 17px; max-height: calc(100svh - 405px); }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .external-screen { position: absolute; top: 4px; right: 16px; bottom: auto; }
+  .cassette-panel { position: absolute; top: 6px; left: 16px; bottom: auto; max-height: calc(100svh - 126px); }
+}
+@media (prefers-reduced-motion: reduce) { .external-screen { animation: none; } }
+
+@media (max-height: 500px) and (orientation: landscape) { .room:has(.external-screen) .timer-panel { right: 352px; bottom: 8px; max-height: calc(100% - 16px); } .cassette-panel { width: min(300px, calc(100vw - 368px)); } }
+
+.external-screen[data-provider="spotify"] .external-player-host, .external-screen[data-provider="spotify"] iframe { height: 152px; min-height: 152px; }
+@media (max-height: 500px) and (orientation: landscape) {
+  .room:has(.external-screen) .scene, .room:has(.external-screen) .scene-hud { left: 16px; right: auto; top: 50%; transform: translateY(-50%); width: min(calc(100cqw - 368px), calc(100cqh * var(--scene-ratio))); height: auto; aspect-ratio: var(--scene-ratio); }
+}
+@media (max-width: 700px) and (orientation: portrait) { .room:has(.external-screen) .cassette-panel { max-height: calc(100% - 332px); } }
+@media (min-width: 701px) and (max-width: 1200px) and (min-height: 501px) { .external-screen { bottom: 44%; } }

@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { useCassettes } from './useCassettes.ts';
+import { CassettePanel } from './CassettePanel.tsx';
+import { ExternalPlayer } from './ExternalPlayer.tsx';
+import type { ExternalControls, ExternalPhase } from './ExternalPlayer.tsx';
+import { providerNames } from './cassettes.ts';
+import type { Cassette } from './cassettes.ts';
 import { publicAsset } from './assets.ts';
 import { SceneArtwork } from './SceneArtwork.tsx';
 import { useMusic } from './useMusic.ts';
@@ -14,6 +20,17 @@ import { TimerNotice } from './TimerNotice.tsx';
 export function App() {
   const room = useRoom();
   const music = useMusic();
+  const cassettes = useCassettes();
+  const [cassetteOpen, setCassetteOpen] = useState(false);
+  const cassetteRef = useRef<SVGGElement>(null);
+  const [installed, setInstalled] = useState<{ slot: number; tape: Cassette; revision: number } | null>(null);
+  const revision = useRef(0);
+  const [externalPhase, setExternalPhase] = useState<ExternalPhase>('loading');
+  const [canControl, setCanControl] = useState(false);
+  const externalControls = useRef<ExternalControls | null>(null);
+  const screenAction = useRef<HTMLButtonElement>(null);
+  const updateControls = useCallback((controls: ExternalControls | null) => { externalControls.current = controls; setCanControl(!!controls); }, []);
+  const closeCassettes = useCallback((returnFocus = true) => { setCassetteOpen(false); if (returnFocus) cassetteRef.current?.focus({ preventScroll: true }); }, []);
   const timer = useFocusTimer();
   const timerFeedback = useTimerFeedback(timer.state, music.state.volume);
   const toggleTimer = () => {
@@ -42,6 +59,8 @@ export function App() {
     if (returnFocus) radioRef.current?.focus({ preventScroll: true });
   }, []);
   function openPanel() {
+    setCassetteOpen(false);
+    if (installed) { screenAction.current?.focus({ preventScroll: true }); return; }
     setTimerOpen(false);
     setPanelOpen(true);
     // An already open panel should also return focus to its main action.
@@ -64,15 +83,28 @@ export function App() {
       document.removeEventListener('pointerdown', pointerdown);
     };
   }, [panelOpen, closePanel]);
+  useEffect(() => { if (installed) screenAction.current?.focus({ preventScroll: true }); }, [installed]);
+  function installCassette(slot: number, tape: Cassette) {
+    music.pause();
+    cassettes.playInsertSound(state.volume);
+    setExternalPhase('loading'); setCanControl(false);
+    setInstalled({ slot, tape, revision: ++revision.current });
+    setCassetteOpen(false); setPanelOpen(false); setTimerOpen(false);
+  }
+  function ejectCassette(openRadio = false) {
+    setInstalled(null); setCanControl(false); externalControls.current = null;
+    if (openRadio) { setCassetteOpen(false); setTimerOpen(false); setPanelOpen(true); }
+  }
   return (
     <main className="room" aria-label="Домашняя комната для кодинга">
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
         <div className="scene" id="scene" data-light={room.dimmed ? "dimmed" : "normal"}>
           <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt="Девушка в наушниках работает за ноутбуком у окна. За окном закат над городом и рекой. На столе — стакан кофе, часы, радио и лампа." fetchPriority="high" width="1671" height="941" />
           <ClockDisplay state={timer.state} />
+          {installed && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">TAPE 0{installed.slot + 1}</text></g></svg>}
           <TimerNotice visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
-          <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />
-          <SceneArtwork dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          {!installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
+          <SceneArtwork cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setTimerOpen(false); setPanelOpen(false); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">Радио LofLume</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>
@@ -83,7 +115,20 @@ export function App() {
           </section>
           <audio id="scene-audio" ref={music.audioRef} preload="none"></audio>
         </div>
+          <CassettePanel open={cassetteOpen} slots={cassettes.slots} activeSlot={installed?.slot} persistent={cassettes.persistent} objectRef={cassetteRef} onClose={closeCassettes} onSave={(slot, tape) => { cassettes.save(slot, tape); if (!tape && installed?.slot === slot) ejectCassette(); }} onInstall={installCassette} />
+          {installed && <section className="external-screen" data-provider={installed.tape.provider} data-phase={externalPhase} aria-label={`Плеер кассеты ${installed.slot + 1}`}>
+            <header className="external-screen-heading"><span>TAPE 0{installed.slot + 1}<span className="external-screen-name"> · {installed.tape.name}</span></span><button ref={screenAction} type="button" onClick={() => ejectCassette(true)} title="Вынуть кассету и вернуться к радио">↩ Радио</button></header>
+            <ExternalPlayer key={installed.revision} tape={installed.tape} volume={state.volume} onPhase={setExternalPhase} onControls={updateControls} />
+            <div className="external-screen-footer"><a href={installed.tape.url} target="_blank" rel="noopener noreferrer">Открыть в сервисе ↗</a>{externalPhase === 'loading' ? <span role="status">Загрузка…</span> : externalPhase === 'error' ? <button type="button" onClick={() => { setExternalPhase('loading'); setInstalled({ ...installed, revision: ++revision.current }); }}>Повторить</button> : null}</div>
+            {externalPhase === 'error' && <p className="external-error" role="status">Не удалось запустить. Попробуй открыть ссылку в сервисе.</p>}
+          </section>}
+          {installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
         <div className="scene-hud">
+          {installed ? <div className="now-playing tape-now-playing" id="tape-now-playing" aria-label={`Кассета ${installed.slot + 1}: ${installed.tape.name}`}>
+            <button className="radio-toggle" type="button" aria-label={canControl ? externalPhase === 'playing' ? 'Пауза кассеты' : 'Включить кассету' : 'Вынуть кассету'} title={canControl ? 'Управление кассетой' : 'Вынуть кассету'} onClick={() => { if (canControl) externalControls.current?.toggle(); else ejectCassette(); }}><svg viewBox="0 0 20 20" aria-hidden="true"><path d={canControl ? externalPhase === 'playing' ? 'M7 5v10M13 5v10' : 'M7 4l9 6-9 6Z' : 'M5 5h10v10H5Z'}/></svg></button>
+            <div className="ticker-viewport"><div className="ticker-track">{[0, 1].map(copy => <span className="ticker-copy" key={copy} aria-hidden={copy === 1 ? true : undefined}><span className="ticker-title">{installed.tape.name}</span><span>—</span><a className="ticker-artist" href={installed.tape.url} target="_blank" rel="noopener noreferrer" tabIndex={copy === 1 ? -1 : undefined}>{providerNames[installed.tape.provider]}</a></span>)}</div></div>
+          </div> : <>
+
         <div className="now-playing" id="now-playing" hidden={state.phase === "idle"} aria-label={playing ? "Сейчас играет: " + state.track.title + " — " + state.track.artist : "Радио LofLume"}>
           <button className="radio-toggle" id="radio-toggle" onClick={music.toggle} type="button" aria-label={playLabel} title={playLabel}><svg viewBox="0 0 20 20" aria-hidden="true"><path id="radio-toggle-icon" d={active ? "M7 5v10M13 5v10" : "M7 4l9 6-9 6Z"}/></svg></button>
           <div className="ticker-viewport" hidden={!playing}><div className="ticker-track">
@@ -92,6 +137,7 @@ export function App() {
           </div></div>
           <span className="radio-status" id="radio-status" hidden={playing}>{state.phase === "loading" ? "Загрузка…" : state.phase === "error" ? "Повторить запуск" : "Радио на паузе"}</span>
         </div>
+        </>}
         </div>
       </div>
       <header className="room-header">

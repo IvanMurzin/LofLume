@@ -41,3 +41,5 @@
 - Current scene: user-provided `public/assets/cozy-coding-v6.webp`; source and provenance in `docs/assets/cozy-coding-v6.md`. Future object ideas live in `docs/IDEAS.md`; do not implement them merely because they are pictured.
 - React components live in `src/App.tsx` and `src/SceneArtwork.tsx`; `useRoom` and `useMusic` own browser subscriptions with cleanup. Keep `src/music.ts` independent of React. Compare browser screenshots when changing the render tree.
 - `pnpm test` runs focused music and timer state/failure regression tests with Node type stripping. No lint command exists. Do browser QA for visual changes.
+
+- Active follow-up: `cassette-library`, explicitly approved by the owner: three saved links (YouTube/YouTube Music, Spotify, Yandex), insertion sound, TAPE indicator and visible screen above the radio. See docs/CASSETTES.md for supported URLs and provider limitations. Do not hide a playing YouTube iframe or claim full subscriber playback was tested. Prototype awaits product feedback; baseline cozy-coding-room remains accepted.
