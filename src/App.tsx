@@ -10,7 +10,7 @@ import { publicAsset } from './assets.ts';
 import { SceneArtwork } from './SceneArtwork.tsx';
 import { useMusic } from './useMusic.ts';
 import { useRoom } from './useRoom.ts';
-import { useFocusTimer } from './useFocusTimer.ts';
+import { useSessionClock } from './useSessionClock.ts';
 import { ClockDisplay } from './ClockDisplay.tsx';
 import { TimerPanel } from './TimerPanel.tsx';
 import { formatTimer } from './timer.ts';
@@ -31,8 +31,8 @@ export function App() {
   const screenAction = useRef<HTMLButtonElement>(null);
   const updateControls = useCallback((controls: ExternalControls | null) => { externalControls.current = controls; setCanControl(!!controls); }, []);
   const closeCassettes = useCallback((returnFocus = true) => { setCassetteOpen(false); if (returnFocus) cassetteRef.current?.focus({ preventScroll: true }); }, []);
-  const timer = useFocusTimer();
-  const timerFeedback = useTimerFeedback(timer.state, music.state.volume);
+  const timer = useSessionClock();
+  const timerFeedback = useTimerFeedback(timer.state, music.state.volume, timer);
   const toggleTimer = () => {
     if (timer.state.phase !== "running" && timer.valid) timerFeedback.prepareSound();
     timer.toggle();
@@ -103,7 +103,7 @@ export function App() {
           <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt="Девушка в наушниках работает за ноутбуком у окна. За окном закат над городом и рекой. На столе — стакан кофе, часы, радио и лампа." fetchPriority="high" width="1671" height="941" />
           <ClockDisplay state={timer.state} />
           {installed && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
-          <TimerNotice visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
+          <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
           {!installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
           <SceneArtwork cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setTimerOpen(false); setPanelOpen(false); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>

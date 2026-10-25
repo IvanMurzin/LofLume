@@ -42,6 +42,8 @@
 - React components live in `src/App.tsx` and `src/SceneArtwork.tsx`; `useRoom` and `useMusic` own browser subscriptions with cleanup. Keep `src/music.ts` independent of React. Compare browser screenshots when changing the render tree.
 - `pnpm test` runs focused music and timer state/failure regression tests with Node type stripping. No lint command exists. Do browser QA for visual changes.
 
-- Active follow-up: `cassette-library`, explicitly approved by the owner: three saved links (YouTube/YouTube Music, Spotify, Yandex), insertion sound, TAPE indicator and visible screen above the radio. See docs/CASSETTES.md for supported URLs and provider limitations. Do not hide a playing YouTube iframe or claim full subscriber playback was tested. Prototype awaits product feedback; baseline cozy-coding-room remains accepted.
+- Active follow-up: `cassette-library`, explicitly approved by the owner: three saved links (YouTube/YouTube Music, Spotify, Yandex), insertion sound, TAPE indicator and visible screen above the radio. See docs/CASSETTES.md for supported URLs and provider limitations. Do not hide a playing YouTube iframe or claim full subscriber playback was tested. Cassette iteration was accepted on 2026-10-25; baseline cozy-coding-room remains accepted.
 
 - Cassette review accepted (2026-10-25): the owner explicitly approved the local result and requested one commit + push. Publish this reviewed block as one checkpoint. Continue accumulating future small feedback fixes into meaningful checkpoints.
+
+- Clock modes follow-up (2026-10-25): approved implementation adds stopwatch and pomodoro alongside the existing timer. See docs/CLOCK.md and clock-modes change. Three-mode UI and tests were accepted by the owner on 2026-10-25; owner explicitly requested one commit + push of this checkpoint. No mandatory long soak test.

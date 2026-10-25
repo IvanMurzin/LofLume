@@ -1,39 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TimerState } from './timer.ts';
-import { getTimerTitle } from './timer.ts';
 import { TimerChime } from './timerChime.ts';
 
-export function useTimerFeedback(state: TimerState, volume: number) {
+type ClockFeedback = { title: string; completionId: number; mode: string };
+export function useTimerFeedback(state: TimerState, volume: number, feedback: ClockFeedback) {
   const chime = useRef<TimerChime | null>(null);
-  const previousPhase = useRef(state.phase);
+  const previous = useRef({ phase: state.phase, event: feedback.completionId, mode: feedback.mode });
   const [noticeVisible, setNoticeVisible] = useState(false);
-  const title = getTimerTitle(state);
   useEffect(() => {
-    const signal = new TimerChime();
-    chime.current = signal;
+    const signal = new TimerChime(); chime.current = signal;
     const originalTitle = document.title;
-    return () => {
-      signal.dispose();
-      chime.current = null;
-      document.title = originalTitle;
-    };
+    return () => { signal.dispose(); chime.current = null; document.title = originalTitle; };
   }, []);
-  useEffect(() => { document.title = title; }, [title]);
+  useEffect(() => { document.title = feedback.title; }, [feedback.title]);
   useEffect(() => {
-    const previous = previousPhase.current;
-    previousPhase.current = state.phase;
-    if (state.phase === 'finished' && previous === 'running') {
-      setNoticeVisible(true);
-      chime.current?.play(volume);
-    } else if (state.phase === 'idle' || state.phase === 'running') {
-      setNoticeVisible(false);
-      if (state.phase === 'idle') chime.current?.cancel();
-    }
-  }, [state.phase, volume]);
+    const before = previous.current;
+    previous.current = { phase: state.phase, event: feedback.completionId, mode: feedback.mode };
+    if (before.mode !== feedback.mode || state.phase === 'idle') { setNoticeVisible(false); chime.current?.cancel(); }
+    else if (feedback.completionId !== before.event) { setNoticeVisible(true); chime.current?.play(volume); }
+    else if (state.phase === 'running' && before.phase !== 'running') setNoticeVisible(false);
+  }, [state.phase, volume, feedback.completionId, feedback.mode]);
   return {
     noticeVisible,
     dismissNotice: useCallback(() => setNoticeVisible(false), []),
-    // Called synchronously by Start/Continue, within the user's audio gesture.
     prepareSound: useCallback(() => chime.current?.prepare(), []),
   };
 }
