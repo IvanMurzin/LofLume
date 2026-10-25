@@ -43,3 +43,5 @@
 - `pnpm test` runs focused music and timer state/failure regression tests with Node type stripping. No lint command exists. Do browser QA for visual changes.
 
 - Active follow-up: `cassette-library`, explicitly approved by the owner: three saved links (YouTube/YouTube Music, Spotify, Yandex), insertion sound, TAPE indicator and visible screen above the radio. See docs/CASSETTES.md for supported URLs and provider limitations. Do not hide a playing YouTube iframe or claim full subscriber playback was tested. Prototype awaits product feedback; baseline cozy-coding-room remains accepted.
+
+- Cassette review accepted (2026-10-25): the owner explicitly approved the local result and requested one commit + push. Publish this reviewed block as one checkpoint. Continue accumulating future small feedback fixes into meaningful checkpoints.

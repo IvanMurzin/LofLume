@@ -1,49 +1,81 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { parseCassette, providerNames } from './cassettes.ts';
 import type { Cassette, CassetteSlots } from './cassettes.ts';
 
 type Props = { open: boolean; slots: CassetteSlots; activeSlot?: number; persistent: boolean; objectRef: RefObject<SVGGElement | null>; onClose: (returnFocus?: boolean) => void; onSave: (slot: number, tape: Cassette | null) => void; onInstall: (slot: number, tape: Cassette) => void };
+const play = <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 4 8 6-8 6Z"/></svg>;
 export function CassettePanel({ open, slots, activeSlot, persistent, objectRef, onClose, onSave, onInstall }: Props) {
-  const [selected, setSelected] = useState<number | null>(null);
   const [editing, setEditing] = useState<number | null>(null);
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [editorPosition, setEditorPosition] = useState({ side: false, top: 0 });
+  const editorRef = useRef<HTMLFormElement>(null);
+  const containers = useRef<(HTMLDivElement | null)[]>([]);
   const panelRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const installRef = useRef<HTMLButtonElement>(null);
-  const firstRef = useRef<HTMLButtonElement>(null);
+  const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
   useEffect(() => {
     if (!open) return;
-    firstRef.current?.focus({ preventScroll: true });
+    rowRefs.current[0]?.focus({ preventScroll: true });
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
     const outside = (event: PointerEvent) => { if (event.target instanceof Node && !panelRef.current?.contains(event.target) && !objectRef.current?.contains(event.target)) onClose(false); };
     document.addEventListener('keydown', onKey); document.addEventListener('pointerdown', outside);
     return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('pointerdown', outside); };
   }, [open, onClose, objectRef]);
-  useEffect(() => {
-    if (!open) return;
-    if (editing !== null) inputRef.current?.focus();
-    else if (selected !== null && slots[selected]) installRef.current?.focus({ preventScroll: true });
-    else firstRef.current?.focus({ preventScroll: true });
-  }, [editing, open, selected, slots]);
-  function edit(slot: number) { setSelected(slot); setEditing(slot); setUrl(slots[slot]?.url ?? ''); setName(slots[slot]?.name ?? ''); setError(''); }
-  const tape = selected !== null ? slots[selected] : null;
+  useEffect(() => { if (open && editing !== null) inputRef.current?.focus(); }, [editing, open, editorPosition.side]);
+  useLayoutEffect(() => {
+    if (!open) { setEditing(null); setUrl(''); setName(''); setError(''); return; }
+    if (editing === null) return;
+    const panel = panelRef.current; const row = containers.current[editing]; const form = editorRef.current;
+    const viewport = panel?.parentElement;
+    if (!panel || !row || !form || !viewport) return;
+    const update = () => {
+      const outer = viewport.getBoundingClientRect(); const bounds = panel.getBoundingClientRect(); const item = row.getBoundingClientRect();
+      const height = form.offsetHeight; const width = form.offsetWidth; const x = bounds.right + 12;
+      const y = Math.max(outer.top + 8, Math.min(item.top, outer.bottom - height - 8));
+      const frame = viewport.querySelector('.external-screen iframe')?.getBoundingClientRect();
+      const overlapsVideo = frame && x < frame.right && x + width > frame.left && y < frame.bottom && y + height > frame.top;
+      const side = x + width <= outer.right - 8 && !overlapsVideo;
+      const top = side ? y - bounds.top : 0;
+      setEditorPosition(previous => previous.side === side && Math.abs(previous.top - top) < .5 ? previous : { side, top });
+    };
+    update();
+    const observer = new ResizeObserver(update); observer.observe(viewport); observer.observe(panel); observer.observe(form);
+    panel.addEventListener('scroll', update, true); window.addEventListener('resize', update);
+    return () => { observer.disconnect(); panel.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
+  }, [open, editing, editorPosition.side]);
+  function edit(slot: number) {
+    if (editing === slot) { setEditing(null); rowRefs.current[slot]?.focus(); return; }
+    setEditing(slot); setUrl(slots[slot]?.url ?? ''); setName(slots[slot]?.name ?? ''); setError('');
+  }
+  const editor = editing === null ? null : (
+    <form ref={editorRef} id={`cassette-editor-${editing}`} className={`cassette-editor ${editorPosition.side ? "cassette-side-editor" : "cassette-inline-editor"}`} style={editorPosition.side ? { top: editorPosition.top } : undefined} noValidate onSubmit={event => {
+        event.preventDefault(); const parsed = parseCassette(url, name || `Кассета 0${editing + 1}`);
+        if (!parsed) { setError('Вставь полную ссылку на YouTube, Spotify или Яндекс Музыку.'); return; }
+        const slot = editing; onSave(slot, parsed); setEditing(null); setError(''); rowRefs.current[slot]?.focus({ preventScroll: true });
+      }}>
+        <label htmlFor={`cassette-url-${editing}`}>Ссылка</label><input ref={inputRef} id={`cassette-url-${editing}`} type="url" value={url} maxLength={2048} placeholder="Вставь ссылку" autoComplete="off" spellCheck={false} aria-invalid={!!error} aria-describedby={error ? `cassette-error-${editing}` : undefined} onChange={event => { setUrl(event.target.value); setError(''); }} />
+        <label htmlFor={`cassette-name-${editing}`}>Название</label><div className="cassette-save-row"><input id={`cassette-name-${editing}`} value={name} maxLength={60} placeholder={`Кассета 0${editing + 1}`} autoComplete="off" onChange={event => setName(event.target.value)} /><button className="music-play" type="submit">Сохранить</button></div>
+        {error && <p id={`cassette-error-${editing}`} className="cassette-error" role="alert">{error}</p>}
+    </form>
+  );
   return <section id="cassette-panel" className="cassette-panel" ref={panelRef} hidden={!open} role="dialog" aria-modal="false" aria-labelledby="cassette-heading">
     <header className="music-panel-heading"><span id="cassette-heading">Кассеты</span><button className="music-close" type="button" aria-label="Закрыть кассеты" onClick={() => onClose()}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
-    {editing === null ? <>
-      <div className="cassette-slots">{slots.map((item, slot) => <button key={slot} ref={slot === 0 ? firstRef : undefined} type="button" className={`cassette-slot tape-color-${slot}${selected === slot ? ' is-selected' : ''}`} aria-label={`Кассета ${slot + 1} — ${item?.name ?? 'пустая'}`} aria-pressed={selected === slot} onClick={() => { if (!item) edit(slot); else setSelected(slot); }}>
-        <svg viewBox="0 0 260 76" aria-hidden="true"><rect x="2" y="2" width="256" height="72" rx="7"/><path d="m51 72 10-18h138l10 18"/><rect x="20" y="10" width="220" height="37" rx="3"/><circle cx="89" cy="61" r="6"/><circle cx="171" cy="61" r="6"/><path d="M95 61h70"/></svg>
-        <span className="cassette-number">0{slot + 1}</span><span className="cassette-name">{item?.name ?? 'Вставить ссылку'}</span><span className="cassette-service">{activeSlot === slot ? 'В радио · ' : ''}{item ? providerNames[item.provider] : 'Пустая кассета'}</span>
-      </button>)}</div>
-      {tape && selected !== null && <div className="cassette-actions"><button id="install-cassette" ref={installRef} className="music-play" type="button" onClick={() => onInstall(selected, tape)}>Поставить</button><button type="button" className="tape-link-button" onClick={() => edit(selected)}>Заменить</button><button type="button" className="tape-link-button" aria-label="Удалить кассету" onClick={() => { onSave(selected, null); setSelected(null); }}>Убрать</button></div>}
-    </> : <form className="cassette-editor" noValidate onSubmit={event => { event.preventDefault(); const parsed = parseCassette(url, name || `Кассета 0${editing + 1}`); if (!parsed) { setError('Нужна ссылка на видео или подборку YouTube, Spotify или Яндекс Музыки. Для короткой ссылки скопируй полный адрес из браузера.'); return; } onSave(editing, parsed); setSelected(editing); setEditing(null); setError(''); }}>
-      <label htmlFor="cassette-url">Ссылка на музыку</label><input ref={inputRef} id="cassette-url" type="url" value={url} maxLength={2048} placeholder="Вставь ссылку" autoComplete="off" spellCheck={false} aria-invalid={!!error} aria-describedby={error ? 'cassette-error' : undefined} onChange={event => { setUrl(event.target.value); setError(''); }} />
-      <label htmlFor="cassette-name">Надпись на кассете</label><input id="cassette-name" value={name} maxLength={60} placeholder={`Кассета 0${editing + 1}`} autoComplete="off" onChange={event => setName(event.target.value)} />
-      {error && <p id="cassette-error" className="cassette-error" role="alert">{error}</p>}
-      <div className="cassette-actions"><button className="music-play" type="submit">Сохранить</button><button className="tape-link-button" type="button" onClick={() => { setEditing(null); setError(''); }}>Назад</button></div>
-    </form>}
-    <p className="cassette-storage" role="status">{persistent ? 'Ссылки сохраняются в этом браузере.' : 'Браузер не дал сохранить кассеты. Пока они останутся в этой вкладке.'}</p>
+    <div className="cassette-slots">{slots.map((item, slot) => <div key={slot} ref={element => { containers.current[slot] = element; }} className={`cassette-row tape-color-${slot}${item ? ' is-filled' : ' is-empty'}${activeSlot === slot ? ' is-installed' : ''}`} data-slot={slot} data-filled={!!item}>
+      <div className="cassette-card">
+        <svg className="cassette-drawing" viewBox="0 0 300 88" aria-hidden="true"><rect className="cassette-shell" x="2" y="2" width="296" height="84" rx="8"/><rect className="cassette-paper" x="16" y="11" width="268" height="40" rx="3"/><path d="M70 84 80 61h140l10 23"/><circle className="cassette-reel" cx="115" cy="71" r="7"/><circle className="cassette-reel" cx="185" cy="71" r="7"/><path d="M123 71h54"/></svg>
+        <button ref={element => { rowRefs.current[slot] = element; }} className="cassette-label-button" type="button" aria-label={item ? `Изменить кассету ${slot + 1} — ${item.name}` : `Добавить кассету ${slot + 1}`} aria-expanded={editing === slot} aria-controls={`cassette-editor-${slot}`} onClick={() => edit(slot)}>
+          <span className="cassette-number">0{slot + 1}</span><span className="cassette-name">{item?.name ?? '+'}</span><span className="cassette-service">{item ? `${activeSlot === slot ? 'В радио · ' : ''}${providerNames[item.provider]}` : ''}</span>
+        </button>
+        {item && <div className="cassette-row-actions"><button type="button" className="cassette-put" aria-label={`Поставить ${item.name}`} title="Поставить" onClick={() => onInstall(slot, item)}>{play}</button><button type="button" aria-label={`Удалить ${item.name}`} title="Удалить" onClick={() => { onSave(slot, null); if (editing === slot) setEditing(null); rowRefs.current[slot]?.focus(); }}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M8 3h4l1 3M6 6l1 11h6l1-11M9 9v5M11 9v5"/></svg></button></div>}
+      </div>
+      {editing === slot && !editorPosition.side && editor}
+
+    </div>)}
+    </div>
+    {editorPosition.side && editor}
+    {!persistent && <p className="cassette-storage" role="status">Браузер не дал сохранить кассеты. Пока они останутся в этой вкладке.</p>}
   </section>;
 }

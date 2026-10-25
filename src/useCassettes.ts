@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cassetteStorageKey, restoreCassettes, serializeCassettes } from './cassettes.ts';
 import type { Cassette, CassetteSlots } from './cassettes.ts';
+import type { CassetteAction } from './CassetteSound.ts';
 import { CassetteSound } from './CassetteSound.ts';
 
 export function useCassettes() {
@@ -16,5 +17,5 @@ export function useCassettes() {
     next[slot] = tape; setSlots(next);
     try { localStorage.setItem(cassetteStorageKey, serializeCassettes(next)); setPersistent(true); } catch { setPersistent(false); }
   };
-  return { slots, persistent, save, playInsertSound(volume: number) { sound.current?.play(volume); } };
+  return { slots, persistent, save, playSound(volume: number, action: CassetteAction) { sound.current?.play(volume, action); } };
 }

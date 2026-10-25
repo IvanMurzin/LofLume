@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { Cassette } from './cassettes.ts';
 
 export type ExternalPhase = 'loading' | 'waiting' | 'playing' | 'paused' | 'error';
-export type ExternalControls = { toggle: () => void };
+export type ExternalControls = { toggle: () => void; previous?: () => void; next?: () => void };
 type YouTubePlayer = { playVideo(): void; pauseVideo(): void; getPlayerState(): number; setVolume(value: number): void; destroy(): void };
 type SpotifyController = { play(): void; togglePlay(): void; destroy(): void; addListener(event: string, callback: (event: { data: { isPaused: boolean } }) => void): void };
 type SpotifyAPI = { createController(element: HTMLElement, options: { uri: string; width: string; height: number }, callback: (controller: SpotifyController) => void): void };
@@ -39,6 +39,8 @@ type Props = { tape: Cassette; volume: number; onPhase: (phase: ExternalPhase) =
 export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const youtube = useRef<YouTubePlayer | null>(null);
+  const yandexFrame = useRef<HTMLIFrameElement>(null);
+  const yandexState = useRef({ playing: false, started: false });
   const frameLoaded = useRef<() => void>(() => {});
   const volumeRef = useRef(volume);
   volumeRef.current = volume;
@@ -51,9 +53,28 @@ export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
     const ready = () => { clearTimeout(timeout); if (!cancelled) onPhase('waiting'); };
     frameLoaded.current = ready;
     const failed = () => { clearTimeout(timeout); if (!cancelled) onPhase('error'); };
-    const hidden = () => { if (document.hidden) youtube.current?.pauseVideo(); };
-    document.addEventListener('visibilitychange', hidden);
-    if (tape.provider === 'youtube') {
+    let removeYandexListener: (() => void) | undefined;
+    if (tape.provider === 'yandex') {
+      const send = (type: string) => yandexFrame.current?.contentWindow?.postMessage({ source: 'EXTERNAL_PLAYER', type }, 'https://music.yandex.ru');
+      yandexState.current = { playing: false, started: false };
+      const receive = (event: MessageEvent) => {
+        if (cancelled || event.origin !== 'https://music.yandex.ru' || event.source !== yandexFrame.current?.contentWindow) return;
+        const data: unknown = event.data;
+        if (!data || typeof data !== 'object' || !('source' in data) || data.source !== 'YANDEX_MUSIC' || !('type' in data)) return;
+        if (data.type === 'READY') {
+          ready();
+          onControls({ toggle: () => send(yandexState.current.playing ? 'PAUSE' : yandexState.current.started ? 'RESUME' : 'PLAY_SOURCE'), previous: () => send('PREVIOUS_TRACK'), next: () => send('NEXT_TRACK') });
+          if (volumeRef.current > 0) send('PLAY_SOURCE');
+        } else if (data.type === 'STATE' && 'payload' in data && data.payload && typeof data.payload === 'object' && 'status' in data.payload) {
+          const status = data.payload.status;
+          if (status === 'PLAYING') { yandexState.current = { playing: true, started: true }; onPhase('playing'); }
+          else if (['PAUSED', 'STOPPED', 'ENDED'].includes(String(status))) { yandexState.current.playing = false; onPhase('paused'); }
+          else if (status === 'ERROR') failed();
+        } else if (data.type === 'ERROR') failed();
+      };
+      window.addEventListener('message', receive);
+      removeYandexListener = () => window.removeEventListener('message', receive);
+    } else if (tape.provider === 'youtube') {
       void youtubeAPI().then(() => {
         if (cancelled || !host.current || !window.YT) return;
         const mount = document.createElement('div'); host.current.replaceChildren(mount);
@@ -65,7 +86,9 @@ export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
               if (cancelled) return;
               youtube.current = target; ready(); target.setVolume(Math.round(volumeRef.current * 100));
               onControls({ toggle: () => { if (target.getPlayerState() === 1) target.pauseVideo(); else target.playVideo(); } });
-              if (!document.hidden) target.playVideo();
+              const frame = host.current?.querySelector('iframe');
+              if (frame) frame.setAttribute('allow', "autoplay; encrypted-media; fullscreen; picture-in-picture 'none'");
+              target.playVideo();
             },
             onStateChange: ({ data }) => { if (!cancelled) { if (data === 1) onPhase('playing'); else if (data === 2 || data === 0) onPhase('paused'); } },
             onError: failed, onAutoplayBlocked: ready,
@@ -79,6 +102,8 @@ export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
         const mount = document.createElement('div'); host.current.replaceChildren(mount);
         api.createController(mount, { uri: tape.spotifyUri!, width: '100%', height: 152 }, controller => {
           if (cancelled) { controller.destroy(); return; }
+          const frame = host.current?.querySelector('iframe');
+          if (frame) frame.setAttribute('allow', "autoplay; encrypted-media; fullscreen; picture-in-picture 'none'");
           destroy = () => controller.destroy();
           controller.addListener('ready', () => { if (!cancelled) { ready(); onControls({ toggle: () => controller.togglePlay() }); if (volumeRef.current > 0) controller.play(); } });
           controller.addListener('playback_update', event => { if (!cancelled) { clearTimeout(timeout); onPhase(event.data.isPaused ? 'paused' : 'playing'); } });
@@ -86,14 +111,16 @@ export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
       }).catch(failed);
     }
     return () => {
-      cancelled = true; clearTimeout(timeout); document.removeEventListener('visibilitychange', hidden);
-      onControls(null); youtube.current = null;
+      cancelled = true; clearTimeout(timeout);
+      removeYandexListener?.(); onControls(null); youtube.current = null;
       try { destroy?.(); } catch { /* Removing the frame still stops playback. */ }
       host.current?.replaceChildren();
     };
   }, [tape, onControls, onPhase]);
-  // React owns the Yandex iframe; it is removed on eject. There is no assumed pause API.
+  // The widget retains its own authentication, licensing and account checks.
+  const yandexUrl = new URL(tape.embedUrl);
+  if (tape.provider === 'yandex') { yandexUrl.searchParams.set('display', 'bandlink-wiki'); yandexUrl.searchParams.set('parentOrigin', window.location.origin); }
   return tape.provider === 'yandex'
-    ? <iframe className="external-frame" src={tape.embedUrl} title={`Яндекс Музыка — ${tape.name}`} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => frameLoaded.current()} onError={() => onPhase('error')} />
+    ? <iframe ref={yandexFrame} className="external-frame" src={yandexUrl.href} title={`Яндекс Музыка — ${tape.name}`} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture 'none'" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => frameLoaded.current()} onError={() => onPhase('error')} />
     : <div className="external-player-host" ref={host} />;
 }
