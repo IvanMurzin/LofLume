@@ -47,3 +47,5 @@
 - Cassette review accepted (2026-10-25): the owner explicitly approved the local result and requested one commit + push. Publish this reviewed block as one checkpoint. Continue accumulating future small feedback fixes into meaningful checkpoints.
 
 - Clock modes follow-up (2026-10-25): approved implementation adds stopwatch and pomodoro alongside the existing timer. See docs/CLOCK.md and clock-modes change. Three-mode UI and tests were accepted by the owner on 2026-10-25; owner explicitly requested one commit + push of this checkpoint. No mandatory long soak test.
+
+- Notebook follow-up (2026-10-25): owner chose one free Markdown sheet. NotesPanel/useNotes provide Live Preview (lazy CodeMirror) and reading modes, immediate localStorage persistence and storage-error fallback; mode icons sit bottom-left. The notebook participates in scene outlines/discovery. See docs/NOTES.md and room-notebook change; the owner accepted all three modes (source/live/reading) on 2026-10-25 and explicitly requested one commit + push of this notebook checkpoint.

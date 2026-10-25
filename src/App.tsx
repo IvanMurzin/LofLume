@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { NotesPanel } from './NotesPanel.tsx';
+import { useNotes } from './useNotes.ts';
 import { useCassettes } from './useCassettes.ts';
 import { CassettePanel } from './CassettePanel.tsx';
 import { PlayerScreen } from './PlayerScreen.tsx';
@@ -21,6 +23,10 @@ export function App() {
   const room = useRoom();
   const music = useMusic();
   const cassettes = useCassettes();
+  const notes = useNotes();
+  const [notesOpen, setNotesOpen] = useState(false);
+  const notesRef = useRef<SVGGElement>(null);
+  const closeNotes = useCallback((returnFocus = true) => { setNotesOpen(false); if (returnFocus) notesRef.current?.focus({ preventScroll: true }); }, []);
   const [cassetteOpen, setCassetteOpen] = useState(false);
   const cassetteRef = useRef<SVGGElement>(null);
   const [installed, setInstalled] = useState<{ slot: number; tape: Cassette; revision: number } | null>(null);
@@ -59,6 +65,7 @@ export function App() {
     if (returnFocus) radioRef.current?.focus({ preventScroll: true });
   }, []);
   function openPanel() {
+    setNotesOpen(false);
     setCassetteOpen(false);
     if (installed) { screenAction.current?.focus({ preventScroll: true }); return; }
     setTimerOpen(false);
@@ -89,7 +96,7 @@ export function App() {
     cassettes.playSound(state.volume, 'insert');
     setExternalPhase('loading'); setCanControl(false);
     setInstalled({ slot, tape, revision: ++revision.current });
-    setCassetteOpen(false); setPanelOpen(false); setTimerOpen(false);
+    setNotesOpen(false); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(false);
   }
   function ejectCassette(openRadio = false) {
     if (installed) cassettes.playSound(state.volume, 'eject');
@@ -105,7 +112,7 @@ export function App() {
           {installed && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
           <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
           {!installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
-          <SceneArtwork cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setTimerOpen(false); setPanelOpen(false); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <SceneArtwork notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setNotesOpen(false); setTimerOpen(false); setPanelOpen(false); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={`Часы — ${formatTimer(timer.state.remainingMs)}`} onOpenTimer={() => { setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">Радио LofLume</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label="Закрыть радио"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>
@@ -116,6 +123,7 @@ export function App() {
           </section>
           <audio id="scene-audio" ref={music.audioRef} preload="none"></audio>
         </div>
+          <NotesPanel open={notesOpen} notes={notes} objectRef={notesRef} onClose={closeNotes} />
           <CassettePanel open={cassetteOpen} slots={cassettes.slots} activeSlot={installed?.slot} persistent={cassettes.persistent} objectRef={cassetteRef} onClose={closeCassettes} onSave={(slot, tape) => { cassettes.save(slot, tape); if (!tape && installed?.slot === slot) ejectCassette(); }} onInstall={installCassette} />
           {installed && <PlayerScreen controls={externalControls.current} tape={installed.tape} revision={installed.revision} phase={externalPhase} volume={state.volume} actionRef={screenAction} onEject={() => ejectCassette(true)} onRetry={() => { setExternalPhase('loading'); setInstalled({ ...installed, revision: ++revision.current }); }} onPhase={setExternalPhase} onControls={updateControls} />}
           {installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
