@@ -1,3 +1,4 @@
+import { ru } from './locales/ru.ts';
 import { createTimer, formatTimer, timerReducer } from './timer.ts';
 import type { TimerState } from './timer.ts';
 
@@ -37,11 +38,15 @@ export function clockValue(state: ClockState): TimerState {
   if (state.mode === 'pomodoro') return state.pomodoro.timer;
   return { phase: state.stopwatch.phase, remainingMs: Math.floor(state.stopwatch.elapsedMs / 1000) * 1000, deadline: null };
 }
-export function clockTitle(state: ClockState): string {
+export function formatStopwatch(elapsedMs: number): string {
+  const total = Math.floor(Math.max(0, elapsedMs) / 1000);
+  return [Math.floor(total / 3600), Math.floor(total / 60) % 60, total % 60].map(value => String(value).padStart(2, '0')).join(':');
+}
+export function clockTitle(state: ClockState, labels = { focus: ru.focus, rest: ru.break }): string {
   const current = clockValue(state);
   if (current.phase === 'idle') return 'LofLume — Home Work';
-  const suffix = state.mode === 'pomodoro' ? state.pomodoro.stage === 'focus' ? ' · Фокус' : ' · Перерыв' : '';
-  return `LofLume | ${formatTimer(current.remainingMs)}${suffix}`;
+  const suffix = state.mode === 'pomodoro' ? ` · ${state.pomodoro.stage === 'focus' ? labels.focus : labels.rest}` : '';
+  return `LofLume | ${state.mode === 'stopwatch' ? formatStopwatch(current.remainingMs) : formatTimer(current.remainingMs)}${suffix}`;
 }
 function beginPomodoro(state: ClockState, now: number): ClockState {
   const stage = readyPomodoroStage(state);
@@ -88,6 +93,6 @@ export function clockReducer(state: ClockState, action: ClockAction): ClockState
     }
   }
 }
-export function completionMessage(kind: ClockState['completion']['kind']): string {
-  return kind === 'timer' ? 'Время вышло' : kind === 'focus' ? 'Фокус завершён' : 'Перерыв окончен';
+export function completionMessage(kind: ClockState['completion']['kind'], labels = { timer: ru.timeUp, focus: ru.focusDone, rest: ru.breakDone }): string {
+  return kind === 'timer' ? labels.timer : kind === 'focus' ? labels.focus : labels.rest;
 }

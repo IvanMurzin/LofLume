@@ -1,3 +1,4 @@
+import { useI18n } from './I18n.tsx';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, RefObject, PointerEvent, KeyboardEvent } from 'react';
 import { ExternalPlayer } from './ExternalPlayer.tsx';
@@ -7,6 +8,7 @@ import type { Cassette } from './cassettes.ts';
 type Props = { controls: ExternalControls | null; tape: Cassette; revision: number; phase: ExternalPhase; volume: number; actionRef: RefObject<HTMLButtonElement | null>; onEject: () => void; onRetry: () => void; onPhase: (phase: ExternalPhase) => void; onControls: (controls: ExternalControls | null) => void };
 type Point = { x: number; y: number };
 export function PlayerScreen({ controls, tape, revision, phase, volume, actionRef, onEject, onRetry, onPhase, onControls }: Props) {
+  const { t } = useI18n();
   const screenRef = useRef<HTMLElement>(null);
   const [position, setPosition] = useState<Point | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -51,14 +53,14 @@ export function PlayerScreen({ controls, tape, revision, phase, volume, actionRe
     setPosition(clamp({ x: point.x + offset[0] * step, y: point.y + offset[1] * step }));
   }
   const style: CSSProperties | undefined = position ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' } : undefined;
-  return <section ref={screenRef} className="external-screen" style={style} data-provider={tape.provider} data-phase={phase} data-dragging={dragging} aria-label={`Плеер — ${tape.name}`}>
+  return <section ref={screenRef} className="external-screen" style={style} data-provider={tape.provider} data-phase={phase} data-dragging={dragging} aria-label={t('playerLabel', { name: tape.name })}>
     <header className="external-screen-heading">
-      <span className="player-drag-handle" tabIndex={0} role="button" aria-label={`Переместить плеер ${tape.name}`} title="Потяни, чтобы переместить" onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={() => { drag.current = null; setDragging(false); }} onKeyDown={keyMove}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 4h.1M10 4h.1M5 8h.1M10 8h.1M5 12h.1M10 12h.1"/></svg><span>{tape.name}</span></span>
-      <button ref={actionRef} type="button" className="eject-cassette" onClick={onEject} aria-label="Достать кассету"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 12 6-8 6 8ZM4 16h12"/></svg><span>Достать кассету</span></button>
+      <span className="player-drag-handle" tabIndex={0} role="button" aria-label={t('movePlayer', { name: tape.name })} title={t('dragPlayer')} onPointerDown={start} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onLostPointerCapture={() => { drag.current = null; setDragging(false); }} onKeyDown={keyMove}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 4h.1M10 4h.1M5 8h.1M10 8h.1M5 12h.1M10 12h.1"/></svg><span>{tape.name}</span></span>
+      <button ref={actionRef} type="button" className="eject-cassette" onClick={onEject} aria-label={t('eject')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 12 6-8 6 8ZM4 16h12"/></svg><span>{t('eject')}</span></button>
     </header>
     <ExternalPlayer key={revision} tape={tape} volume={volume} onPhase={onPhase} onControls={onControls} />
-    {tape.provider === 'yandex' && controls?.previous && controls.next && <div className="compact-transport" aria-label="Управление Яндекс Музыкой"><button type="button" aria-label="Предыдущий трек" onClick={controls.previous}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5v10M15 5 7 10l8 5Z"/></svg></button><button type="button" aria-label={phase === 'playing' ? 'Пауза кассеты' : 'Включить кассету'} onClick={controls.toggle}><svg viewBox="0 0 20 20" aria-hidden="true"><path d={phase === 'playing' ? 'M7 5v10M13 5v10' : 'M6 4l8 6-8 6Z'}/></svg></button><button type="button" aria-label="Следующий трек" onClick={controls.next}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15 5v10M5 5l8 5-8 5Z"/></svg></button></div>}
-    {phase === 'loading' && <p className="external-loading" role="status">Загрузка…</p>}
-    {phase === 'error' && <div className="external-screen-footer external-error-actions" role="status"><span>Не удалось включить</span><button type="button" onClick={onRetry}>Повторить</button><a href={tape.url} target="_blank" rel="noopener noreferrer">Открыть в сервисе</a></div>}
+    {tape.provider === 'yandex' && controls?.previous && controls.next && <div className="compact-transport" aria-label={t('yandexControls')}><button type="button" aria-label={t('previousTrack')} onClick={controls.previous}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5v10M15 5 7 10l8 5Z"/></svg></button><button type="button" aria-label={phase === 'playing' ? t('tapePause') : t('tapePlay')} onClick={controls.toggle}><svg viewBox="0 0 20 20" aria-hidden="true"><path d={phase === 'playing' ? 'M7 5v10M13 5v10' : 'M6 4l8 6-8 6Z'}/></svg></button><button type="button" aria-label={t('nextTrack')} onClick={controls.next}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15 5v10M5 5l8 5-8 5Z"/></svg></button></div>}
+    {phase === 'loading' && <p className="external-loading" role="status">{t('loading')}</p>}
+    {phase === 'error' && <div className="external-screen-footer external-error-actions" role="status"><span>{t('playerError')}</span><button type="button" onClick={onRetry}>{t('retry')}</button><a href={tape.url} target="_blank" rel="noopener noreferrer">{t('openService')}</a></div>}
   </section>;
 }

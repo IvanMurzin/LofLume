@@ -1,3 +1,4 @@
+import { useI18n } from './I18n.tsx';
 import { useEffect, useRef } from 'react';
 import type { Cassette } from './cassettes.ts';
 
@@ -37,6 +38,7 @@ function spotifyAPI(): Promise<SpotifyAPI> {
 
 type Props = { tape: Cassette; volume: number; onPhase: (phase: ExternalPhase) => void; onControls: (controls: ExternalControls | null) => void };
 export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
+  const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const youtube = useRef<YouTubePlayer | null>(null);
   const yandexFrame = useRef<HTMLIFrameElement>(null);
@@ -121,6 +123,6 @@ export function ExternalPlayer({ tape, volume, onPhase, onControls }: Props) {
   const yandexUrl = new URL(tape.embedUrl);
   if (tape.provider === 'yandex') { yandexUrl.searchParams.set('display', 'bandlink-wiki'); yandexUrl.searchParams.set('parentOrigin', window.location.origin); }
   return tape.provider === 'yandex'
-    ? <iframe ref={yandexFrame} className="external-frame" src={yandexUrl.href} title={`Яндекс Музыка — ${tape.name}`} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture 'none'" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => frameLoaded.current()} onError={() => onPhase('error')} />
+    ? <iframe ref={yandexFrame} className="external-frame" src={yandexUrl.href} title={t('yandexTitle', { name: tape.name })} allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture 'none'" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => frameLoaded.current()} onError={() => onPhase('error')} />
     : <div className="external-player-host" ref={host} />;
 }

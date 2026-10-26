@@ -5,7 +5,7 @@ const select=(s,mode,now=0)=>act(s,{type:'select',mode,now});
 const toggle=(s,now=0,seconds=60)=>act(s,{type:'toggle',now,seconds});
 const tick=(s,now)=>act(s,{type:'tick',now});
 test('stopwatch counts real elapsed time, pauses exactly and resets independently',()=>{
- let s=toggle(select(createClock(),'stopwatch'),1000);s=tick(s,4500);assert.equal(s.stopwatch.elapsedMs,3500);assert.equal(clockTitle(s),'LofLume | 00:03');
+ let s=toggle(select(createClock(),'stopwatch'),1000);s=tick(s,4500);assert.equal(s.stopwatch.elapsedMs,3500);assert.equal(clockTitle(s),'LofLume | 00:00:03');
  s=toggle(s,4750);assert.equal(s.stopwatch.elapsedMs,3750);s=tick(s,100000);assert.equal(s.stopwatch.elapsedMs,3750);
  s=toggle(s,200000);s=tick(s,200250);assert.equal(s.stopwatch.elapsedMs,4000);
  s=act(s,{type:'reset'});assert.equal(s.stopwatch.elapsedMs,0);assert.equal(s.stopwatch.phase,'idle');assert.equal(clockTitle(s),'LofLume — Home Work');
@@ -51,4 +51,11 @@ test('settings are validated and duration changes are blocked after cycle starts
  let s=select(createClock(),'pomodoro');s=act(s,{type:'settings',settings:{focus:1,short:2,long:3}});s=toggle(s);assert.equal(s.pomodoro.timer.remainingMs,60000);
  s=act(s,{type:'settings',settings:{focus:99,auto:true}});assert.equal(s.settings.focus,1);assert.equal(s.settings.auto,true);
  s=act(s,{type:'reset'});s=act(s,{type:'settings',settings:{focus:99}});assert.equal(s.settings.focus,99);
+});
+
+test('stopwatch browser title shows hours, minutes and seconds without changing countdown format',()=>{
+ let s=toggle(select(createClock(),'stopwatch'),1000);s=tick(s,1000+3723456);
+ assert.equal(clockTitle(s),'LofLume | 01:02:03');
+ s=toggle(s,1000+3723456);assert.equal(clockTitle(s),'LofLume | 01:02:03');
+ assert.equal(clockTitle(toggle(createClock(),0,1500)),'LofLume | 25:00');
 });

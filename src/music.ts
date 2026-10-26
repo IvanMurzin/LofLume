@@ -97,7 +97,7 @@ export class SceneMusic {
     this.wanted = false;
     this.audio.pause();
     this.phase = 'error';
-    this.error = 'Не удалось включить музыку. Попробуй ещё раз.';
+    this.error = 'playback';
     this.notify();
   }
 

@@ -1,7 +1,8 @@
+import { ru } from './locales/ru.ts';
 export type Provider = 'youtube' | 'spotify' | 'yandex';
 export type Cassette = { url: string; name: string; provider: Provider; embedUrl: string; videoId?: string; listId?: string; spotifyUri?: string };
 export type CassetteSlots = [Cassette | null, Cassette | null, Cassette | null];
-export const providerNames: Record<Provider, string> = { youtube: 'YouTube', spotify: 'Spotify', yandex: 'Яндекс Музыка' };
+export const providerNames: Record<Provider, string> = { youtube: 'YouTube', spotify: 'Spotify', yandex: ru.providerYandex };
 export const cassetteStorageKey = 'loflume.cassettes.v1';
 const youtubeHosts = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be']);
 const yandexHosts = new Set(['music.yandex.ru', 'music.yandex.com', 'music.yandex.by', 'music.yandex.kz', 'music.yandex.uz']);
@@ -27,14 +28,14 @@ export function parseCassette(input: string, name = ''): Cassette | null {
     const canonical = new URL(videoId ? `https://www.youtube.com/watch?v=${videoId}` : 'https://www.youtube.com/playlist');
     const embed = new URL(`https://www.youtube.com/embed/${videoId ?? 'videoseries'}`);
     if (listId) { canonical.searchParams.set('list', listId); embed.searchParams.set('list', listId); }
-    return { url: canonical.href, name: title || 'Моя подборка', provider: 'youtube', embedUrl: embed.href, videoId, listId };
+    return { url: canonical.href, name: title || ru.myMix, provider: 'youtube', embedUrl: embed.href, videoId, listId };
   }
   if (url.hostname === 'open.spotify.com') {
     if (/^intl-[a-z]{2}$/.test(segments[0] ?? '')) segments.shift();
     if (segments[0] === 'embed') segments.shift();
     const [kind, id] = segments;
     if (segments.length !== 2 || !['playlist', 'album', 'track'].includes(kind ?? '') || !/^[A-Za-z0-9]{22}$/.test(id ?? '')) return null;
-    return { url: `https://open.spotify.com/${kind}/${id}`, name: title || 'Моя подборка', provider: 'spotify', embedUrl: `https://open.spotify.com/embed/${kind}/${id}?theme=0`, spotifyUri: `spotify:${kind}:${id}` };
+    return { url: `https://open.spotify.com/${kind}/${id}`, name: title || ru.myMix, provider: 'spotify', embedUrl: `https://open.spotify.com/embed/${kind}/${id}?theme=0`, spotifyUri: `spotify:${kind}:${id}` };
   }
   if (yandexHosts.has(url.hostname)) {
     let parts = segments;
@@ -54,7 +55,7 @@ export function parseCassette(input: string, name = ''): Cassette | null {
     } else if (parts.length === 3 && parts[0] === 'track' && /^\d+$/.test(parts[1]!) && /^\d+$/.test(parts[2]!)) {
       path = `/album/${parts[2]}/track/${parts[1]}`; embedPath = parts.join('/');
     } else return null;
-    return { url: `https://music.yandex.ru${path}`, name: title || 'Моя подборка', provider: 'yandex', embedUrl: `https://music.yandex.ru/iframe/${embedPath}` };
+    return { url: `https://music.yandex.ru${path}`, name: title || ru.myMix, provider: 'yandex', embedUrl: `https://music.yandex.ru/iframe/${embedPath}` };
   }
   return null;
 }

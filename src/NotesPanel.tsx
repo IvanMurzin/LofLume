@@ -1,3 +1,4 @@
+import { useI18n } from './I18n.tsx';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import Markdown from 'react-markdown';
@@ -8,6 +9,7 @@ const LiveMarkdownEditor = lazy(() => import('./LiveMarkdownEditor.tsx').then(mo
 
 type Props = { open: boolean; notes: ReturnType<typeof useNotes>; objectRef: RefObject<SVGGElement | null>; onClose: (returnFocus?: boolean) => void };
 export function NotesPanel({ open, notes, objectRef, onClose }: Props) {
+  const { t } = useI18n();
   const panelRef = useRef<HTMLElement>(null);
   const inputRef = useRef<LiveEditorHandle>(null);
   const readRef = useRef<HTMLDivElement>(null);
@@ -58,10 +60,10 @@ export function NotesPanel({ open, notes, objectRef, onClose }: Props) {
     return () => { resize.disconnect(); mutation.disconnect(); player?.removeEventListener('animationend', update); };
   }, [open]);
   return <section id="notes-panel" className="notes-panel" ref={panelRef} hidden={!open} style={placement} data-mode={mode} role="dialog" aria-modal="false" aria-labelledby="notes-heading">
-    <header className="music-panel-heading"><span id="notes-heading">Блокнот</span><button className="music-close" type="button" aria-label="Закрыть блокнот" onClick={() => onClose()}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
-    <div className="notes-sheet notes-editor-shell" hidden={reading}><Suspense fallback={<div className="notes-editor-loading" role="status">Загрузка…</div>}>{editorLoaded && <LiveMarkdownEditor ref={inputRef} source={mode === 'source'} active={open && !reading} value={notes.text} onChange={notes.update}/>}</Suspense></div>
-    {reading && <div ref={readRef} className="notes-sheet notes-preview" tabIndex={0} aria-label="Текст заметки">{notes.text.trim() ? <Markdown components={{ a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer"/> }}>{notes.text}</Markdown> : <p className="notes-empty">Пока пусто.</p>}</div>}
-    <div className="notes-modes" role="group" aria-label="Режим блокнота"><button type="button" aria-label="Исходный Markdown" title="Исходный Markdown" aria-pressed={mode === 'source'} onClick={() => setMode('source')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5-5 5 5 5M13 5l5 5-5 5M11 3 9 17"/></svg></button><button type="button" aria-label="Live Preview" title="Live Preview" aria-pressed={mode === 'live'} onClick={() => setMode('live')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 13 8.5-8.5 3 3L7 16l-4 1Z M11 6l3 3"/></svg></button><button type="button" aria-label="Читать" title="Читать" aria-pressed={reading} onClick={() => setMode('read')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 5C8 3.5 5 3.5 2.5 4.5v11C5 14.5 8 14.5 10 16c2-1.5 5-1.5 7.5-.5v-11C15 3.5 12 3.5 10 5Zm0 0v11"/></svg></button><span>Markdown</span></div>
-    {!notes.persistent && <p className="notes-storage" role="status">Не удалось сохранить. Текст пока останется в этой вкладке.</p>}
+    <header className="music-panel-heading"><span id="notes-heading">{t('notebook')}</span><button className="music-close" type="button" aria-label={t('closeNotebook')} onClick={() => onClose()}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
+    <div className="notes-sheet notes-editor-shell" hidden={reading}><Suspense fallback={<div className="notes-editor-loading" role="status">{t('loading')}</div>}>{editorLoaded && <LiveMarkdownEditor ref={inputRef} source={mode === 'source'} active={open && !reading} value={notes.text} onChange={notes.update}/>}</Suspense></div>
+    {reading && <div ref={readRef} className="notes-sheet notes-preview" tabIndex={0} aria-label={t('noteText')}>{notes.text.trim() ? <Markdown components={{ a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer"/> }}>{notes.text}</Markdown> : <p className="notes-empty">{t('emptyNote')}</p>}</div>}
+    <div className="notes-modes" role="group" aria-label={t('noteMode')}><button type="button" aria-label={t('sourceMode')} title={t('sourceMode')} aria-pressed={mode === 'source'} onClick={() => setMode('source')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5-5 5 5 5M13 5l5 5-5 5M11 3 9 17"/></svg></button><button type="button" aria-label={t('livePreview')} title={t('livePreview')} aria-pressed={mode === 'live'} onClick={() => setMode('live')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 13 8.5-8.5 3 3L7 16l-4 1Z M11 6l3 3"/></svg></button><button type="button" aria-label={t('readMode')} title={t('readMode')} aria-pressed={reading} onClick={() => setMode('read')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 5C8 3.5 5 3.5 2.5 4.5v11C5 14.5 8 14.5 10 16c2-1.5 5-1.5 7.5-.5v-11C15 3.5 12 3.5 10 5Zm0 0v11"/></svg></button><span>Markdown</span></div>
+    {!notes.persistent && <p className="notes-storage" role="status">{t('noteStorageError')}</p>}
   </section>;
 }

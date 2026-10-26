@@ -30,3 +30,5 @@ test('storage keeps three independent slots, revalidates URLs and ignores persis
 test('missing audio support and muted insertion never block cassette actions',()=>{
   const sound=new CassetteSound();assert.doesNotThrow(()=>{sound.play(0);sound.play(.45);sound.dispose();});
 });
+
+test('Yandex homepage and personal wave are not accepted as playable embed sources',()=>{for(const url of ['https://music.yandex.ru/','https://music.yandex.ru/home','https://music.yandex.ru/rotor/user:onyourwave'])assert.equal(parseCassette(url,'My Wave'),null);});

@@ -12,7 +12,7 @@ export function useRoom() {
   });
   const [exploring, setExploring] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState<'' | 'fullscreenDenied'>('');
   const [imageError, setImageError] = useState(false);
   const [imageSrc, setImageSrc] = useState(publicAsset('assets/cozy-coding-v6.webp'));
   const [ratio, setRatio] = useState(1671 / 941);
@@ -68,7 +68,7 @@ export function useRoom() {
       try {
         if (document.fullscreenElement) await document.exitFullscreen();
         else await document.documentElement.requestFullscreen();
-      } catch { setStatus('Браузер не разрешил полноэкранный режим.'); }
+      } catch { setStatus('fullscreenDenied'); }
     },
   };
 }
