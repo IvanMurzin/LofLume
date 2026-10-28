@@ -18,7 +18,7 @@ export function SceneArtwork({ dictionaryRef, languageOpen, onOpenLanguage, note
               <path className="object-shape" d="M1426 639 L1498 635 L1498 627 L1506 627 L1632 632 L1636 632 L1636 642 L1671 645 L1671 759 L1641 772 L1427 758 Q1414 757 1415 744 L1416 654 Q1416 641 1426 639 Z"/>
             </g>
             <g className="object-target" data-object="light" tabIndex={0} role="button" aria-label={dimmed ? t('restoreLight') : t('dimLight')} aria-pressed={dimmed} onClick={onToggleLight} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onToggleLight(); } }}>
-              <path className="object-shape" d="M1438 312 C1401 311 1369 344 1355 378 Q1349 384 1358 390 C1393 412 1466 438 1506 438 Q1518 438 1520 427 C1526 380 1503 332 1476 320 Q1456 311 1438 312 Z"/>
+              <path className="object-shape exclude-discovery" d="M1438 312 C1401 311 1369 344 1355 378 Q1349 384 1358 390 C1393 412 1466 438 1506 438 Q1518 438 1520 427 C1526 380 1503 332 1476 320 Q1456 311 1438 312 Z"/>
             </g>
             <g ref={cassetteRef} className="object-target" data-object="cassettes" tabIndex={0} role="button" aria-label={t('tapesHint')} aria-haspopup="dialog" aria-expanded={cassetteOpen} aria-controls="cassette-panel" onClick={onOpenCassettes} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onOpenCassettes(); } }}><path className="object-shape" d="M202 342 L228 338 L302 346 L302 361 L300 364 L303 365 L303 379 L301 383 L303 385 L303 398 L301 401 L303 404 L303 416 L301 420 L303 423 L302 434 L301 438 L302 441 L300 456 L201 455 L201 440 L203 436 L202 420 L204 416 L202 401 L204 397 L202 381 L204 377 L202 362 L204 359 Z"/></g>
             <g ref={notesRef} className="object-target" data-object="notes" tabIndex={0} role="button" aria-label={t('notesHint')} aria-haspopup="dialog" aria-expanded={notesOpen} aria-controls="notes-panel" onClick={onOpenNotes} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onOpenNotes(); } }}><path className="object-shape" d="M960 808 L1280 850 L1280 862 L1290 865 L1284 877 L1098 922 L757 872 Q745 869 749 856 L749 846 Q752 837 773 837 Z"/></g>
@@ -28,7 +28,6 @@ export function SceneArtwork({ dictionaryRef, languageOpen, onOpenLanguage, note
               <g className="annotation"><text x="320" y="305" transform="rotate(-6 320 305)">{t('hintTapes')}</text><path className="annotation-arrow" d="M359 315 Q328 320 300 357"/></g>
               <g className="annotation"><text x="1170" y="855" transform="rotate(-7 1170 855)">{t('hintClock')}</text><path className="annotation-arrow" d="M1233 826 Q1250 816 1260 784"/></g>
               <g className="annotation"><text x="1478" y="862" transform="rotate(5 1478 862)">{t('hintRadio')}</text><path className="annotation-arrow" d="M1533 829 Q1555 813 1544 783"/></g>
-              <g className="annotation"><text x="1195" y="250" transform="rotate(-6 1195 250)">{t('hintLamp')}</text><path className="annotation-arrow" d="M1283 256 Q1330 235 1397 333"/></g>
             </g>
           </svg>
   </>;

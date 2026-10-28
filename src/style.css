@@ -159,7 +159,7 @@ h1 {
 .room-objects { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .object-target { outline: none; pointer-events: visiblePainted; }
 .object-shape { fill: transparent; stroke: transparent; stroke-width: 2; transition: fill 180ms ease, stroke 180ms ease, filter 180ms ease; }
-.object-target:hover .object-shape, .object-target:focus-visible .object-shape, .is-exploring .object-shape {
+.object-target:hover .object-shape, .object-target:focus-visible .object-shape, .is-exploring .object-shape:not(.exclude-discovery) {
   fill: rgb(255 229 174 / 10%);
   stroke: rgb(255 236 194 / 55%);
   filter: drop-shadow(0 0 7px rgb(255 221 152 / 50%));
@@ -520,3 +520,25 @@ h1 {
 .language-options svg { flex-shrink: 0; width: 17px; height: 17px; }
 .language-storage { margin: 10px 0 0; color: #e4b99a; font-size: 10px; line-height: 1.5; }
 @media (max-width: 700px) { .language-panel { left: 16px; top: 12px; } }
+
+/* Optional discoveries, anchored above the cup and the toy in artwork coordinates. */
+.small-object-notice {
+  position: absolute; z-index: 2; display: flex; align-items: center; gap: 9px;
+  width: max-content; max-width: min(260px, 86%); padding: 11px 15px;
+  border: 1px solid rgb(255 235 206 / 15%); border-radius: 12px;
+  color: #f1dbb7; background: rgb(37 29 24 / 82%);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 5px 20px rgb(25 16 12 / 14%);
+  font-size: 13px; line-height: 1.5; pointer-events: auto;
+  animation: timer-notice-in 280ms ease both;
+}
+.small-object-notice.is-coffee { left: 37%; bottom: 33.8%; }
+.small-object-notice.is-platypus { left: max(3.5%, calc(100% - 100cqw + 12px)); bottom: 66.5%; }
+.small-object-notice.is-leaving { animation: timer-notice-out 240ms ease both; pointer-events: none; }
+.small-notice-mark { display: grid; place-items: center; flex: 0 0 20px; color: #d9b98d; font-family: Caveat, cursive; font-size: 26px; line-height: 1; }
+.small-notice-mark svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+@container (max-width: 700px) {
+  .small-object-notice { font-size: 12px; padding: 8px 11px; gap: 6px; max-width: 58%; }
+  .small-object-notice.is-coffee { left: 35%; }
+}
+@media (prefers-reduced-motion: reduce) { .small-object-notice, .small-object-notice.is-leaving { animation: none; } }

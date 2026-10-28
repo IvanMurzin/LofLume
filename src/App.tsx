@@ -1,3 +1,4 @@
+import { SmallInteractions } from './SmallInteractions.tsx';
 import { useI18n } from './I18n.tsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
@@ -118,6 +119,7 @@ export function App() {
           <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
           {!installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
           <SceneArtwork dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { setNotesOpen(false); setCassetteOpen(false); setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); setNotesOpen(false); setTimerOpen(false); setPanelOpen(false); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <SmallInteractions />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">{t('radio')}</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label={t('closeRadio')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>

@@ -100,7 +100,6 @@ export const ru = {
   "hintTapes": "кассеты",
   "hintClock": "часы",
   "hintRadio": "радио",
-  "hintLamp": "лампа",
   "hintLanguage": "язык",
   "language": "Язык",
   "closeLanguage": "Закрыть выбор языка",
@@ -120,5 +119,9 @@ export const ru = {
   "editCassette": "Изменить кассету {number} — {name}",
   "addCassette": "Добавить кассету {number}",
   "insertCassette": "Поставить {name}",
-  "deleteCassette": "Удалить {name}"
+  "deleteCassette": "Удалить {name}",
+  "smallObjects": "Маленькие открытия",
+  "platypusAction": "Утконос — случайный факт",
+  "coffeeAction": "Кофе — поддержать автора",
+  "coffeePlaceholder": "Здесь скоро можно будет угостить автора кофе.",
 } satisfies Record<keyof typeof en, string>;

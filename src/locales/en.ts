@@ -98,7 +98,6 @@ export const en = {
   "hintTapes": "tapes",
   "hintClock": "clock",
   "hintRadio": "radio",
-  "hintLamp": "lamp",
   "hintLanguage": "language",
   "language": "Language",
   "closeLanguage": "Close language selection",
@@ -118,5 +117,9 @@ export const en = {
   "editCassette": "Edit tape {number} — {name}",
   "addCassette": "Add tape {number}",
   "insertCassette": "Insert {name}",
-  "deleteCassette": "Delete {name}"
+  "deleteCassette": "Delete {name}",
+  "smallObjects": "Little discoveries",
+  "platypusAction": "Platypus — random fact",
+  "coffeeAction": "Coffee — support the creator",
+  "coffeePlaceholder": "Soon you’ll be able to buy the creator a coffee here.",
 } as const;
