@@ -122,4 +122,7 @@ export const en = {
   "platypusAction": "Platypus — random fact",
   "coffeeAction": "Coffee — support the creator",
   "coffeePlaceholder": "Soon you’ll be able to buy the creator a coffee here.",
+  "platypusName": "Kirchhoff",
+  "factLoadError": "Couldn’t load the facts. Reload the page to try again.",
+  "platypusThinking": "{name} is thinking:",
 } as const;

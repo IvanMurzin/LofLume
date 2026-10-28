@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from './I18n.tsx';
-import { platypusFacts, pickNextFactIndex } from './platypusFacts.ts';
+import { loadFacts, pickNextFactIndex } from './facts.ts';
+import type { Fact } from './facts.ts';
 
 type ObjectName = 'coffee' | 'platypus';
 
@@ -10,18 +11,32 @@ export function SmallInteractions() {
   const [feedback, setFeedback] = useState<{ object: ObjectName; revision: number; factIndex: number | null } | null>(null);
   const [visible, setVisible] = useState(false);
   const count = useRef(0);
+  const [facts, setFacts] = useState<Fact[] | null>(null);
+  const [factError, setFactError] = useState(false);
+  useEffect(() => () => { count.current++; }, []);
   const lastFact = useRef<number | null>(null);
   const noticeRef = useRef<HTMLDivElement>(null);
 
-  function activate(object: ObjectName) {
-    if (object === 'platypus') lastFact.current = pickNextFactIndex(lastFact.current);
-    setFeedback({ object, revision: ++count.current, factIndex: lastFact.current });
+  async function activate(object: ObjectName) {
+    const revision = ++count.current;
+    setFactError(false);
+    setFeedback({ object, revision, factIndex: null });
     setVisible(true);
+    if (object !== 'platypus') return;
+    try {
+      const loaded = facts ?? await loadFacts();
+      if (count.current !== revision) return;
+      setFacts(loaded);
+      lastFact.current = pickNextFactIndex(loaded.length, lastFact.current);
+      setFeedback({ object, revision, factIndex: lastFact.current });
+    } catch {
+      if (count.current === revision) setFactError(true);
+    }
   }
   useEffect(() => {
     if (!feedback || !visible) return;
-    const dismiss = () => setVisible(false);
-    const timer = setTimeout(dismiss, 5200);
+    const dismiss = () => { count.current++; setVisible(false); };
+    const timer = feedback.object === 'platypus' && feedback.factIndex === null && !factError ? undefined : setTimeout(dismiss, 5200);
     const key = (event: KeyboardEvent) => { if (event.key === 'Escape') dismiss(); };
     const outside = (event: PointerEvent) => {
       if (!(event.target instanceof Element)) return;
@@ -37,7 +52,7 @@ export function SmallInteractions() {
       document.removeEventListener('pointerdown', outside);
       document.removeEventListener('visibilitychange', visibility);
     };
-  }, [feedback, visible]);
+  }, [feedback, visible, factError]);
   useEffect(() => {
     if (visible || !feedback) return;
     const timer = setTimeout(() => setFeedback(null), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240);
@@ -55,8 +70,13 @@ export function SmallInteractions() {
 
     </svg>
     {feedback && <div ref={noticeRef} id="small-object-notice" className={`small-object-notice is-${feedback.object}${visible ? '' : ' is-leaving'}`} role="status" aria-live="polite" aria-atomic="true">
-      <span className="small-notice-mark" aria-hidden="true">{feedback.object === 'coffee' ? <svg viewBox="0 0 24 24"><path d="M5 8h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4ZM17 9h2a3 3 0 0 1 0 6h-2M8 3v2m5-2v2"/></svg> : '…'}</span>
-      <span>{feedback.object === 'coffee' ? t('coffeePlaceholder') : platypusFacts[feedback.factIndex ?? 0].text[locale]}</span>
+      {feedback.object === 'coffee' ? <>
+        <span className="small-notice-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h12v8a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4ZM17 9h2a3 3 0 0 1 0 6h-2M8 3v2m5-2v2"/></svg></span>
+        <span>{t('coffeePlaceholder')}</span>
+      </> : <div className="platypus-speech">
+        <span className="platypus-name"><svg className="platypus-thought-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 15a4 4 0 0 1-1-7.8A4.5 4.5 0 0 1 14 5a4 4 0 0 1 5.5 5.6A3.5 3.5 0 0 1 17 16H9"/><circle cx="6.5" cy="18.5" r="1.2"/><circle cx="3" cy="22" r=".6"/></svg><span>{t('platypusThinking', { name: t('platypusName') })}</span></span>
+        <span className="platypus-fact">{factError ? t('factLoadError') : feedback.factIndex === null ? t('loading') : facts?.[feedback.factIndex].text[locale]}</span>
+      </div>}
     </div>}
   </>;
 }

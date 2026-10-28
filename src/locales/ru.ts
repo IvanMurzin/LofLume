@@ -124,4 +124,7 @@ export const ru = {
   "platypusAction": "Утконос — случайный факт",
   "coffeeAction": "Кофе — поддержать автора",
   "coffeePlaceholder": "Здесь скоро можно будет угостить автора кофе.",
+  "platypusName": "Кирхгоф",
+  "factLoadError": "Не удалось загрузить факты. Обнови страницу и попробуй снова.",
+  "platypusThinking": "{name} думает:",
 } satisfies Record<keyof typeof en, string>;
