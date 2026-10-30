@@ -125,4 +125,8 @@ export const en = {
   "platypusName": "Kirchhoff",
   "factLoadError": "Couldn’t load the facts. Reload the page to try again.",
   "platypusThinking": "{name} is thinking:",
+  "movePanel": "Move: {name}",
+  "pinPanel": "Pin: {name}",
+  "unpinPanel": "Unpin: {name}",
+  "resizeNotes": "Resize notebook",
 } as const;

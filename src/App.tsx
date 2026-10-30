@@ -30,6 +30,7 @@ export function App() {
   const music = useMusic();
   const cassettes = useCassettes();
   const notes = useNotes();
+  const [notesPinned, setNotesPinned] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const notesRef = useRef<SVGGElement>(null);
   const closeNotes = useCallback((returnFocus = true) => { setNotesOpen(false); if (returnFocus) notesRef.current?.focus({ preventScroll: true }); }, []);
@@ -49,6 +50,7 @@ export function App() {
     if (timer.state.phase !== "running" && timer.valid) timerFeedback.prepareSound();
     timer.toggle();
   };
+  const [timerPinned, setTimerPinned] = useState(false);
   const [timerOpen, setTimerOpen] = useState(false);
   const clockRef = useRef<SVGGElement>(null);
   const closeTimer = useCallback((returnFocus = true) => {
@@ -70,11 +72,12 @@ export function App() {
     setPanelOpen(false);
     if (returnFocus) radioRef.current?.focus({ preventScroll: true });
   }, []);
+  const raisePanel = (id: string) => document.getElementById(id)?.querySelector<HTMLElement>('.floating-grab')?.focus({ preventScroll: true });
   function openPanel() {
-    setLanguageOpen(false); setNotesOpen(false);
+    setLanguageOpen(false); if (!notesPinned) setNotesOpen(false);
     setCassetteOpen(false);
     if (installed) { screenAction.current?.focus({ preventScroll: true }); return; }
-    setTimerOpen(false);
+    if (!timerPinned) setTimerOpen(false);
     setPanelOpen(true);
     // An already open panel should also return focus to its main action.
     playRef.current?.focus({ preventScroll: true });
@@ -84,7 +87,7 @@ export function App() {
   }, [panelOpen]);
   useEffect(() => {
     if (!panelOpen) return;
-    const keydown = (event: KeyboardEvent) => { if (event.key === 'Escape') closePanel(); };
+    const keydown = (event: KeyboardEvent) => { if (event.key === 'Escape' && !event.defaultPrevented && !document.activeElement?.closest('.floating-panel')) closePanel(); };
     const pointerdown = (event: PointerEvent) => {
       const target = event.target;
       if (target instanceof Node && !panelRef.current?.contains(target) && !radioRef.current?.contains(target)) closePanel(false);
@@ -102,23 +105,22 @@ export function App() {
     cassettes.playSound(state.volume, 'insert');
     setExternalPhase('loading'); setCanControl(false);
     setInstalled({ slot, tape, revision: ++revision.current });
-    setLanguageOpen(false); setNotesOpen(false); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(false);
+    setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); setCassetteOpen(false); setPanelOpen(false); if (!timerPinned) setTimerOpen(false);
   }
   function ejectCassette(openRadio = false) {
     if (installed) cassettes.playSound(state.volume, 'eject');
     setInstalled(null); setCanControl(false); externalControls.current = null;
-    if (openRadio) { setCassetteOpen(false); setTimerOpen(false); setPanelOpen(true); }
+    if (openRadio) { setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(true); }
   }
   return (
     <main className="room" aria-label={t('roomLabel')}>
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
         <div className="scene" id="scene" data-light={room.dimmed ? "dimmed" : "normal"}>
-          <img className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={t('sceneAlt')} fetchPriority="high" width="1671" height="941" />
+          <img draggable={false} className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={t('sceneAlt')} fetchPriority="high" width="1671" height="941" />
           <ClockDisplay state={timer.state} />
           {installed && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
           <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
-          {!installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
-          <SceneArtwork dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { setNotesOpen(false); setCassetteOpen(false); setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); setNotesOpen(false); setTimerOpen(false); setPanelOpen(false); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <SceneArtwork dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { if (!notesPinned) setNotesOpen(false); setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); if (notesOpen) raisePanel('notes-panel'); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); if (cassetteOpen) raisePanel('cassette-panel'); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); if (timerOpen) raisePanel('timer-panel'); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <SmallInteractions />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">{t('radio')}</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label={t('closeRadio')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
@@ -131,10 +133,10 @@ export function App() {
           <audio id="scene-audio" ref={music.audioRef} preload="none"></audio>
         </div>
           <LanguagePanel open={languageOpen} objectRef={dictionaryRef} onClose={closeLanguage} />
-          <NotesPanel open={notesOpen} notes={notes} objectRef={notesRef} onClose={closeNotes} />
+          <NotesPanel pinned={notesPinned} onTogglePin={() => setNotesPinned(value => !value)} open={notesOpen} notes={notes} objectRef={notesRef} onClose={closeNotes} />
           <CassettePanel open={cassetteOpen} slots={cassettes.slots} activeSlot={installed?.slot} persistent={cassettes.persistent} objectRef={cassetteRef} onClose={closeCassettes} onSave={(slot, tape) => { cassettes.save(slot, tape); if (!tape && installed?.slot === slot) ejectCassette(); }} onInstall={installCassette} />
-          {installed && <PlayerScreen controls={externalControls.current} tape={installed.tape} revision={installed.revision} phase={externalPhase} volume={state.volume} actionRef={screenAction} onEject={() => ejectCassette(true)} onRetry={() => { setExternalPhase('loading'); setInstalled({ ...installed, revision: ++revision.current }); }} onPhase={setExternalPhase} onControls={updateControls} />}
-          {installed && <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} />}
+          {installed && <PlayerScreen objectRef={radioRef} controls={externalControls.current} tape={installed.tape} revision={installed.revision} phase={externalPhase} volume={state.volume} actionRef={screenAction} onEject={() => ejectCassette(true)} onRetry={() => { setExternalPhase('loading'); setInstalled({ ...installed, revision: ++revision.current }); }} onPhase={setExternalPhase} onControls={updateControls} />}
+          <TimerPanel timer={{ ...timer, toggle: toggleTimer }} open={timerOpen} clockRef={clockRef} onClose={closeTimer} pinned={timerPinned} onTogglePin={() => setTimerPinned(value => !value)} />
         <div className="scene-hud">
           {installed ? <div className="now-playing tape-now-playing" id="tape-now-playing" aria-label={t('tapeLabel', { number: installed.slot + 1, name: installed.tape.name })}>
             <button className="radio-toggle" type="button" aria-label={canControl ? externalPhase === 'playing' ? t('tapePause') : t('tapePlay') : t('eject')} title={canControl ? t('tapeControls') : t('eject')} onClick={() => { if (canControl) externalControls.current?.toggle(); else ejectCassette(); }}><svg viewBox="0 0 20 20" aria-hidden="true"><path d={canControl ? externalPhase === 'playing' ? 'M7 5v10M13 5v10' : 'M7 4l9 6-9 6Z' : 'M5 5h10v10H5Z'}/></svg></button>

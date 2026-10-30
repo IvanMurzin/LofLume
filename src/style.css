@@ -355,7 +355,7 @@ h1 {
 .cassette-indicator text { fill: #d5c499; font: 11px monospace; letter-spacing: 1px; }
 .tape-led { fill: #a98a53; opacity: .65; }
 .tape-led.is-playing { fill: #dfbc79; opacity: 1; }
-.external-screen { position: absolute; right: 18px; bottom: 36%; width: 320px; max-width: calc(100vw - 32px); padding: 6px; border: 1px solid #78634c; border-radius: 9px; background: #211c18; box-shadow: 0 8px 30px rgb(21 13 8 / 40%); pointer-events: auto; z-index: 4; animation: screen-slide-in 240ms ease both; }
+.external-screen { position: absolute; right: 18px; bottom: 36%; width: 320px; max-width: calc(100vw - 32px); padding: 6px; border: 1px solid #78634c; border-radius: 9px; background: #211c18; box-shadow: 0 8px 30px rgb(21 13 8 / 40%); pointer-events: auto; z-index: 4; animation: none; }
 .external-screen-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 27px; padding: 0 4px 5px; font: 10px monospace; color: #d7bb93; }
 .external-screen-heading > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .external-screen-name { font-family: Caveat, cursive; font-size: 17px; }
@@ -367,7 +367,6 @@ h1 {
 .external-screen-footer a { color: inherit; text-underline-offset: 2px; }
 .external-screen-footer button { padding: 0; border: 0; color: #e3c397; background: transparent; font-size: 10px; }
 .external-error { margin: 6px 4px 2px; font-size: 10px; line-height: 1.4; color: #e5b794; }
-@keyframes screen-slide-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (min-width: 701px) and (max-width: 1200px) { .room:has(.external-screen) .timer-panel { right: calc(38% + 16px); } }
 @media (max-width: 700px) and (orientation: portrait) {
   .external-screen { position: absolute; top: 12px; right: 16px; bottom: auto; }
@@ -548,3 +547,43 @@ h1 {
 .platypus-fact { font-size: inherit; line-height: inherit; }
 
 .platypus-thought-icon { flex: 0 0 16px; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+
+/* Free tools live in a stable body portal, above the entire room, not inside its crop. */
+.floating-panel { position: fixed !important; right: auto !important; bottom: auto !important; max-width: none !important; max-height: calc(100svh - 24px) !important; animation: none !important; transform: none !important; transition: none !important; box-sizing: border-box; padding: 10px 12px; }
+.floating-panel[hidden] { display: none !important; }
+.floating-heading { height: 28px; min-height: 28px; gap: 6px; font-size: 20px; line-height: 28px; flex-shrink: 0; touch-action: none; cursor: grab; user-select: none; }
+.floating-grab { display: inline-flex; gap: 6px; align-items: center; flex: 1; min-width: 0; height: 28px; font: 20px/28px Caveat, cursive; touch-action: none; cursor: grab; }
+.floating-grab > span { display: block; padding-inline: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.floating-grab > svg { width: 13px; height: 16px; flex-shrink: 0; fill: none; stroke: #ad9476; stroke-width: 2; stroke-linecap: round; }
+.floating-grab:focus-visible, .floating-footer-grab:focus-visible { outline: 1px solid #dfbf90; outline-offset: 3px; border-radius: 3px; }
+.floating-heading-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.floating-panel .music-close { width: 28px; height: 28px; margin: 0; padding: 5px; }
+.panel-pin { display: grid; place-items: center; width: 28px; height: 28px; padding: 5px; border: 0; border-radius: 5px; background: transparent; color: #a98e70; }
+.panel-pin:hover, .panel-pin[aria-pressed=true] { color: #f1d3a8; background: #574330; }
+.panel-pin svg { width: 18px; height: 18px; }
+.floating-footer { position: relative; flex-shrink: 0; height: 28px; min-height: 28px; margin-top: 6px; touch-action: none; cursor: grab; user-select: none; }
+.floating-footer-grab { position: absolute; inset: 0; display: block; touch-action: none; cursor: grab; }
+.floating-footer .notes-modes { position: relative; z-index: 1; margin-top: 0; height: 28px; pointer-events: none; }
+.floating-footer .notes-modes button { width: 24px; height: 24px; padding: 4px; pointer-events: auto; }
+.floating-footer .notes-modes > span { padding-right: 14px; }
+.floating-panel[data-dragging=true] .floating-heading, .floating-panel[data-dragging=true] .floating-grab, .floating-panel[data-dragging=true] .floating-footer, .floating-panel[data-dragging=true] .floating-footer-grab { cursor: grabbing; }
+:root[data-panel-gesture] iframe { pointer-events: none !important; }
+:root[data-panel-gesture] { user-select: none; }
+.notes-panel.floating-panel { overflow: hidden; max-height: none !important; min-width: 0; }
+.notes-panel.floating-panel > .notes-sheet { min-height: 0; margin-top: 6px; }
+.panel-resize { position: absolute; right: 2px; bottom: 2px; display: grid; place-items: center; width: 22px; height: 22px; padding: 2px; color: #bda082; background: transparent; border: 0; border-radius: 3px; cursor: nwse-resize; touch-action: none; }
+.panel-resize svg { width: 16px; height: 16px; }
+.panel-resize:hover { color: #f1d3a8; }
+.external-screen.floating-panel .eject-cassette { display: flex; align-items: center; gap: 4px; padding: 4px; border: 0; border-radius: 4px; background: transparent; color: #d8c5ac; font: 9px Manrope, sans-serif; }
+.external-screen.floating-panel .eject-cassette svg { width: 14px; height: 14px; }
+
+.floating-heading { position: sticky; top: 0; z-index: 1; background: inherit; }
+.floating-footer { position: sticky; bottom: 0; background: inherit; }
+
+/* Clock has no footer controls: use its bottom padding as the drag area. */
+.timer-panel > .floating-footer { position: relative; height: 0; min-height: 0; margin-top: 0; }
+.timer-panel > .floating-footer > .floating-footer-grab { inset: 0 -12px auto; height: 10px; }
+
+/* Partially off-screen tools must not create a page scrollbar or scroll the scene on focus. */
+html, body { overflow: hidden; overflow: clip; }
+.scene-image { user-select: none; -webkit-user-drag: none; }

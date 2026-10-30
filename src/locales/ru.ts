@@ -127,4 +127,8 @@ export const ru = {
   "platypusName": "Кирхгоф",
   "factLoadError": "Не удалось загрузить факты. Обнови страницу и попробуй снова.",
   "platypusThinking": "{name} думает:",
+  "movePanel": "Переместить: {name}",
+  "pinPanel": "Закрепить: {name}",
+  "unpinPanel": "Открепить: {name}",
+  "resizeNotes": "Изменить размер блокнота",
 } satisfies Record<keyof typeof en, string>;

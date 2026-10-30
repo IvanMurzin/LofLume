@@ -1,3 +1,4 @@
+import { FloatingPanel } from './FloatingPanel.tsx';
 import { useI18n } from './I18n.tsx';
 import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
@@ -5,7 +6,7 @@ import type { useSessionClock } from './useSessionClock.ts';
 import type { ClockMode, ClockSettings } from './clock.ts';
 import { DurationInput } from './DurationInput.tsx';
 
-type Props = { timer: ReturnType<typeof useSessionClock>; open: boolean; clockRef: RefObject<SVGGElement | null>; onClose: (returnFocus?: boolean) => void };
+type Props = { timer: ReturnType<typeof useSessionClock>; open: boolean; clockRef: RefObject<SVGGElement | null>; onClose: (returnFocus?: boolean) => void; pinned: boolean; onTogglePin: () => void };
 function PomodoroSettings({ settings, locked, onChange }: { settings: ClockSettings; locked: boolean; onChange: (settings: Partial<ClockSettings>) => void }) {
   const { t } = useI18n();
   const stageNames = { focus: t('focus'), short: t('shortBreak'), long: t('longBreak') };
@@ -17,7 +18,7 @@ function PomodoroSettings({ settings, locked, onChange }: { settings: ClockSetti
     <p>{t('longAfterFour')}</p>
   </div>;
 }
-export function TimerPanel({ timer, open, clockRef, onClose }: Props) {
+export function TimerPanel({ timer, open, clockRef, onClose, pinned, onTogglePin }: Props) {
   const { t } = useI18n();
   const modes: [ClockMode, string][] = [['timer', t('timer')], ['stopwatch', t('stopwatch')], ['pomodoro', t('pomodoro')]];
   const stageNames = { focus: t('focus'), short: t('shortBreak'), long: t('longBreak') };
@@ -35,16 +36,8 @@ export function TimerPanel({ timer, open, clockRef, onClose }: Props) {
   useEffect(() => {
     if (!open) { setSettingsOpen(false); return; }
     playRef.current?.focus({ preventScroll: true });
-    const keydown = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
-    const pointerdown = (event: PointerEvent) => {
-      const target = event.target;
-      if (target instanceof Node && !panelRef.current?.contains(target) && !clockRef.current?.contains(target)) onClose(false);
-    };
-    document.addEventListener('keydown', keydown); document.addEventListener('pointerdown', pointerdown);
-    return () => { document.removeEventListener('keydown', keydown); document.removeEventListener('pointerdown', pointerdown); };
-  }, [open, clockRef, onClose]);
-  return <section className="music-panel timer-panel" id="timer-panel" ref={panelRef} role="dialog" aria-modal="false" aria-labelledby="timer-heading" hidden={!open} data-mode={timer.mode}>
-    <header className="music-panel-heading"><span id="timer-heading">{t('clock')}</span><button className="music-close" id="timer-close" onClick={() => onClose()} type="button" aria-label={t('closeClock')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
+  }, [open]);
+  return <FloatingPanel panelRef={panelRef} anchorRef={clockRef} id="timer-panel" className="music-panel timer-panel" title={t('clock')} headingId="timer-heading" open={open} width={320} placement="timer" pinned={pinned} onTogglePin={onTogglePin} onClose={onClose} closeLabel={t('closeClock')} closeId="timer-close" attributes={{ 'data-mode': timer.mode }}>
     <div className="clock-modes" role="group" aria-label={t('clockMode')}>{modes.map(([mode, label]) => <button type="button" key={mode} aria-pressed={timer.mode === mode} onClick={() => { timer.selectMode(mode); setSettingsOpen(false); }}>{label}</button>)}</div>
     <form onSubmit={event => { event.preventDefault(); timer.toggle(); }}>
       <div className="timer-readout" role={editable ? 'group' : 'timer'} aria-label={editable ? t('duration') : readout.join(':')}>
@@ -59,5 +52,5 @@ export function TimerPanel({ timer, open, clockRef, onClose }: Props) {
       <div className="timer-actions"><button className="music-play" id="timer-toggle" ref={playRef} type="submit" disabled={!locked && !timer.valid}><svg viewBox="0 0 20 20" aria-hidden="true">{phase === 'running' ? <path d="M7 5v10M13 5v10"/> : <path d="m6 4 8 6-8 6Z"/>}</svg>{primaryLabel}</button><button className="timer-reset" id="timer-reset" type="button" onClick={timer.reset} disabled={phase === 'idle'} aria-label={t('resetClock')} title={t('reset')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 8a6 6 0 1 1 0 5M4 3v5h5"/></svg></button></div>
     </form>
     {pomo && settingsOpen && <PomodoroSettings settings={timer.model.settings} locked={timer.model.pomodoro.timer.phase !== 'idle'} onChange={timer.setSettings}/>}
-  </section>;
+  </FloatingPanel>;
 }

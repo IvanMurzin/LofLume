@@ -62,7 +62,7 @@ export function SmallInteractions() {
   return <>
     <svg className="room-objects small-objects" viewBox="0 0 1671 941" aria-label={t('smallObjects')}>
       <g className="object-target" data-object="platypus" role="button" tabIndex={0} aria-label={t('platypusAction')} onClick={() => activate('platypus')} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate('platypus'); } }}>
-        <path className="object-shape" d="M89 378 C86 350 103 332 127 329 C157 323 179 338 185 359 L187 367 Q204 375 195 386 L185 395 L187 422 Q201 420 203 435 Q205 450 191 453 L89 453 Q61 454 57 441 Q51 425 61 407 Q71 388 89 378 Z"/>
+        <path className="object-shape" d="M90 378 C86 357 104 333 129 329 C155 324 180 338 186 361 L188 374 C194 378 201 381 198 387 Q196 394 184 398 Q190 409 194 425 Q202 424 204 433 C208 443 201 453 194 454 L168 453 Q145 456 122 453 L85 451 Q64 452 58 441 C50 427 60 408 72 393 Q82 383 90 378 Z"/>
       </g>
       <g className="object-target" data-object="coffee" role="button" tabIndex={0} aria-label={t('coffeeAction')} onClick={() => activate('coffee')} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate('coffee'); } }}>
         <path className="object-shape" d="M696 656 L700 647 Q700 639 715 638 L786 637 Q800 637 803 644 L805 655 L815 658 Q820 661 816 669 L808 673 L799 785 Q799 794 780 795 L725 794 Q711 793 710 785 L699 676 L691 673 Q685 669 691 660 Z"/>

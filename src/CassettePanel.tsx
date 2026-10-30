@@ -1,3 +1,4 @@
+import { FloatingPanel } from './FloatingPanel.tsx';
 import { useI18n } from './I18n.tsx';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
@@ -21,20 +22,16 @@ export function CassettePanel({ open, slots, activeSlot, persistent, objectRef, 
   useEffect(() => {
     if (!open) return;
     rowRefs.current[0]?.focus({ preventScroll: true });
-    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
-    const outside = (event: PointerEvent) => { if (event.target instanceof Node && !panelRef.current?.contains(event.target) && !objectRef.current?.contains(event.target)) onClose(false); };
-    document.addEventListener('keydown', onKey); document.addEventListener('pointerdown', outside);
-    return () => { document.removeEventListener('keydown', onKey); document.removeEventListener('pointerdown', outside); };
-  }, [open, onClose, objectRef]);
+  }, [open]);
   useEffect(() => { if (open && editing !== null) inputRef.current?.focus(); }, [editing, open, editorPosition.side]);
   useLayoutEffect(() => {
     if (!open) { setEditing(null); setUrl(''); setName(''); setError(false); return; }
     if (editing === null) return;
     const panel = panelRef.current; const row = containers.current[editing]; const form = editorRef.current;
-    const viewport = panel?.parentElement;
+    const viewport = document.documentElement;
     if (!panel || !row || !form || !viewport) return;
     const update = () => {
-      const outer = viewport.getBoundingClientRect(); const bounds = panel.getBoundingClientRect(); const item = row.getBoundingClientRect();
+      const outer = { top: 0, right: window.innerWidth, bottom: window.innerHeight }; const bounds = panel.getBoundingClientRect(); const item = row.getBoundingClientRect();
       const height = form.offsetHeight; const width = form.offsetWidth; const x = bounds.right + 12;
       const y = Math.max(outer.top + 8, Math.min(item.top, outer.bottom - height - 8));
       const frame = viewport.querySelector('.external-screen iframe')?.getBoundingClientRect();
@@ -45,8 +42,9 @@ export function CassettePanel({ open, slots, activeSlot, persistent, objectRef, 
     };
     update();
     const observer = new ResizeObserver(update); observer.observe(viewport); observer.observe(panel); observer.observe(form);
+    const movement = new MutationObserver(update); movement.observe(panel, { attributes: true, attributeFilter: ['style'] });
     panel.addEventListener('scroll', update, true); window.addEventListener('resize', update);
-    return () => { observer.disconnect(); panel.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
+    return () => { observer.disconnect(); movement.disconnect(); panel.removeEventListener('scroll', update, true); window.removeEventListener('resize', update); };
   }, [open, editing, editorPosition.side]);
   function edit(slot: number) {
     if (editing === slot) { setEditing(null); rowRefs.current[slot]?.focus(); return; }
@@ -63,8 +61,7 @@ export function CassettePanel({ open, slots, activeSlot, persistent, objectRef, 
         {error && <p id={`cassette-error-${editing}`} className="cassette-error" role="alert">{t('invalidMusicUrl')}</p>}
     </form>
   );
-  return <section id="cassette-panel" className="cassette-panel" ref={panelRef} hidden={!open} role="dialog" aria-modal="false" aria-labelledby="cassette-heading">
-    <header className="music-panel-heading"><span id="cassette-heading">{t('cassettes')}</span><button className="music-close" type="button" aria-label={t('closeCassettes')} onClick={() => onClose()}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
+  return <FloatingPanel panelRef={panelRef} anchorRef={objectRef} id="cassette-panel" className="cassette-panel" title={t('cassettes')} headingId="cassette-heading" open={open} width={310} placement="cassettes" onClose={onClose} closeLabel={t('closeCassettes')}>
     <div className="cassette-slots">{slots.map((item, slot) => <div key={slot} ref={element => { containers.current[slot] = element; }} className={`cassette-row tape-color-${slot}${item ? ' is-filled' : ' is-empty'}${activeSlot === slot ? ' is-installed' : ''}`} data-slot={slot} data-filled={!!item}>
       <div className="cassette-card">
         <svg className="cassette-drawing" viewBox="0 0 300 88" aria-hidden="true"><rect className="cassette-shell" x="2" y="2" width="296" height="84" rx="8"/><rect className="cassette-paper" x="16" y="11" width="268" height="40" rx="3"/><path d="M70 84 80 61h140l10 23"/><circle className="cassette-reel" cx="115" cy="71" r="7"/><circle className="cassette-reel" cx="185" cy="71" r="7"/><path d="M123 71h54"/></svg>
@@ -79,5 +76,5 @@ export function CassettePanel({ open, slots, activeSlot, persistent, objectRef, 
     </div>
     {editorPosition.side && editor}
     {!persistent && <p className="cassette-storage" role="status">{t('cassetteStorageError')}</p>}
-  </section>;
+  </FloatingPanel>;
 }
