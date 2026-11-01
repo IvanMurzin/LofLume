@@ -843,11 +843,11 @@ html, body { overflow: hidden; overflow: clip; }
 .gallery-return { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 40px; padding: 8px 12px; border: 1px solid transparent; border-radius: 8px; color: var(--gallery-muted); background: transparent; font-size: 12px; transition: color 180ms ease, background 180ms ease; }
 .gallery-return svg { width: 17px; height: 17px; }
 .gallery-return:hover { color: var(--gallery-text); background: rgb(235 210 181 / 5%); }
-.gallery-content { width: min(1440px, 100%); margin-inline: auto; padding: clamp(36px, 6vh, 72px) clamp(24px, 5vw, 80px) 64px; }
+.gallery-content { width: min(1600px, 100%); margin-inline: auto; padding: clamp(36px, 6vh, 72px) clamp(24px, 5vw, 80px) 64px; }
 .gallery-intro { margin-bottom: 34px; }
 .gallery-intro h1 { font-size: clamp(34px, 3.2vw, 46px); line-height: 1.2; font-weight: 500; letter-spacing: -1.6px; text-shadow: none; }
 .gallery-intro > p { margin: 12px 0 0; color: var(--gallery-muted); font-size: 14px; line-height: 1.6; }
-.space-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(20px, 2.4vw, 36px); }
+.space-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 2.4vw, 36px); }
 .space-card { --card-accent: #d3aa7c; text-align: start; min-width: 0; padding: 0; background: transparent; border: 0; border-radius: 12px; color: var(--gallery-text); }
 .space-card[data-tone="night-shift"] { --card-accent: #c2a3db; }
 .space-preview { position: relative; overflow: hidden; aspect-ratio: 1671/941; border-radius: 12px; background: var(--gallery-surface); border: 1px solid rgb(245 222 198 / 14%); box-shadow: 0 8px 24px rgb(0 0 0 / 15%); isolation: isolate; transition: border-color 220ms ease, box-shadow 220ms ease; }
@@ -868,20 +868,8 @@ html, body { overflow: hidden; overflow: clip; }
 .space-loading { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(25 20 30 / 65%); font-size: 14px; }
 .space-preview-error { display: grid; place-items: center; height: 100%; color: var(--gallery-muted); font-size: 14px; }
 .space-card:disabled, .gallery-return:disabled { cursor: progress; }
-.coming-space { display: grid; grid-template-columns: 136px minmax(0,1fr) auto; align-items: center; gap: 24px; margin-top: 36px; padding: 16px; border: 1px solid var(--gallery-line); border-radius: 12px; background: linear-gradient(110deg, rgb(144 150 110 / 4%), rgb(235 210 181 / 2%)); }
-.veranda-preview { width: 136px; aspect-ratio: 1.8; border-radius: 6px; overflow: hidden; opacity: .8; }
-.veranda-preview > svg { display: block; width: 100%; height: 100%; }
-.veranda-sky { fill: #595f59; }
-.veranda-ridge-back { fill: #454f45; }
-.veranda-ridge-front { fill: #303c33; }
-.veranda-frame { fill: #3c3029; }
-.veranda-string { stroke: #817363; fill: none; stroke-width: .5; }
-.veranda-bulbs { stroke: #d5b480; stroke-width: 2.2; stroke-linecap: round; }
-.coming-copy h2 { margin: 0; color: #d5c6b4; font-size: 19px; line-height: 1.4; font-weight: 500; letter-spacing: -.3px; }
-.coming-copy p { margin: 5px 0 0; color: var(--gallery-muted); font-size: 12px; line-height: 1.6; }
-.coming-tag { display: inline-flex; align-items: center; gap: 7px; margin-right: 14px; color: #c6b59f; font-family: Caveat, cursive; font-size: 23px; line-height: 1.3; }
-.coming-tag svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.1; }
 .gallery-error { margin: 24px 0 0; color: #e8bfa0; font-size: 13px; line-height: 1.6; }
+@media (min-width: 701px) and (max-width: 1100px) { .space-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) {
   .gallery-header { height: 64px; padding-inline: 24px; }
   .gallery-return { padding-inline: 4px; font-size: 11px; }
@@ -890,11 +878,7 @@ html, body { overflow: hidden; overflow: clip; }
   .space-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .space-card-caption { padding-top: 15px; }
   .space-last { left: 12px; top: 12px; font-size: 10px; }
-  .coming-space { grid-template-columns: 78px minmax(0,1fr); gap: 14px; padding: 12px; margin-top: 28px; }
-  .veranda-preview { width: 78px; grid-row: span 2; }
-  .coming-copy h2 { font-size: 17px; }
-  .coming-copy p { font-size: 11px; }
-  .coming-tag { grid-column: 2; margin: -6px 0 0; font-size: 20px; }
+
 }
 :root[data-space="night-shift"] .scene-viewport { background: radial-gradient(ellipse at 50% 45%, #30243d, #191725 78%); }
 :root[data-space="night-shift"] .object-target:hover .object-shape, :root[data-space="night-shift"] .object-target:focus-visible .object-shape, :root[data-space="night-shift"] .is-exploring .object-shape:not(.exclude-discovery) { fill: rgb(215 183 249 / 7%); stroke: rgb(224 191 255 / 65%); filter: drop-shadow(0 0 5px rgb(194 144 232 / 35%)); }
@@ -915,10 +899,25 @@ html, body { overflow: hidden; overflow: clip; }
 @media (prefers-reduced-motion: reduce) { .space-preview, .gallery-return { transition: none; } }
 
 /* Night Shift has tools on both edges: preserve the complete artwork at every ratio. */
-:root[data-space="night-shift"] .scene,
-:root[data-space="night-shift"] .scene-hud {
+:root:is([data-space="night-shift"], [data-space="cafe-terrace"]) .scene,
+:root:is([data-space="night-shift"], [data-space="cafe-terrace"]) .scene-hud {
   left: 50%; right: auto; top: 50%;
   width: min(100cqw, calc(100cqh * var(--scene-ratio)));
   height: auto; aspect-ratio: var(--scene-ratio);
   transform: translate(-50%, -50%);
 }
+
+:root[data-space="cafe-terrace"] {
+  --ink-25211e: #252c28;
+  --ink-211e1c: #1e2522;
+  --ink-302823: #2c352f;
+  --ink-28211c: #252d28;
+  --ink-574330: #4e5843;
+  --ink-1e1916: #1c2420;
+  --ink-3c3026: #384237;
+}
+.space-card[data-tone="cafe-terrace"] { --card-accent: #b6c29b; }
+:root[data-space="cafe-terrace"] .scene-viewport { background: radial-gradient(ellipse at 50% 45%, #303b32, #1b2320 78%); }
+:root[data-space="cafe-terrace"] .timer-notice-slot { left: min(85.6%, calc(100% - 90px)); bottom: 26%; }
+:root[data-space="cafe-terrace"] .music-panel:not(.floating-panel) { left: 46%; right: auto; bottom: 13%; }
+:root[data-space="cafe-terrace"] .small-object-notice.is-coffee { left: min(60%, max(12px, calc(100% - 272px))); bottom: 24%; }

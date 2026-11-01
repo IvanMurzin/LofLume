@@ -141,4 +141,6 @@ export const ru = {
   "returnToSpace": "Обратно в комнату",
   "enterSpace": "Открыть {name}",
   "previewUnavailable": "Превью недоступно",
+  "cafeSceneAlt": "Девушка с ноутбуком на веранде кафе с видом на лесистые холмы на закате.",
+  "hintMusic": "музыка",
 } satisfies Record<keyof typeof en, string>;

@@ -39,6 +39,7 @@ export function FloatingPanel({ panelRef, anchorRef, id, className, title, headi
     if (position) { setPosition(clampPanel(position, dimensions, view)); return; }
     const anchor = anchorRef?.current?.getBoundingClientRect();
     let x = placement === 'player' ? view.width - dimensions.width - 24 : placement === 'cassettes' ? 24 : (anchor?.left ?? view.width * .65) - dimensions.width - 16;
+    if (placement === 'cassettes' && anchor && anchor.left > view.width / 2) x = anchor.left - dimensions.width - 16;
     let y = placement === 'cassettes' ? Math.max(76, (anchor?.top ?? 100) - 36) : (anchor?.top ?? view.height * .75) - dimensions.height - 16;
     if (placement === 'notes') x = (anchor ? anchor.left + anchor.width / 2 : view.width / 2) - dimensions.width / 2;
     x = Math.max(12, Math.min(x, view.width - dimensions.width - 12));

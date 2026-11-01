@@ -24,13 +24,8 @@ export function SpaceGallery({ current, loading, error, onEnter }: Props) {
             {space.id === current && <span className="space-last"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12M3 14V6a5 5 0 0 1 10 0v8Z"/></svg>{t('lastSpace')}</span>}
             {loading === space.id && <span className="space-loading" role="status">{t('loading')}</span>}
           </div>
-          <div className="space-card-caption"><div><h2>{space.title}</h2><p>{space.id === 'home-work' ? 'Lofi · chill · focus' : 'Lofi · synth · night'}</p></div><span className="space-enter">{arrow}</span></div>
+          <div className="space-card-caption"><div><h2>{space.title}</h2><p>{space.tagline}</p></div><span className="space-enter">{arrow}</span></div>
         </button>)}
-      </div>
-      <div className="coming-space" aria-label={`Da Lat — ${t('comingSoon')}`}>
-        <div className="veranda-preview" aria-hidden="true"><svg viewBox="0 0 180 100"><path className="veranda-sky" d="M0 0h180v100H0Z"/><path className="veranda-ridge-back" d="M0 62Q22 41 45 58T89 48T132 52T180 38V100H0Z"/><path className="veranda-ridge-front" d="M0 81Q32 54 65 76T123 70T180 68V100H0Z"/><path className="veranda-frame" d="M0 0h180v9L0 20Zm26 16h3v84h-3Z"/><path className="veranda-string" d="M0 20q90 20 180-8"/><g className="veranda-bulbs"><path d="M15 23v6m31-2v6m32-4v6m32-7v6m32-12v6m29-15v6"/></g></svg></div>
-        <div className="coming-copy"><h2>Da Lat</h2><p>{t('verandaDescription')}</p></div>
-        <span className="coming-tag"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m8 2 1.5 4.5L14 8l-4.5 1.5L8 14 6.5 9.5 2 8l4.5-1.5Z"/></svg>{t('comingSoon')}</span>
       </div>
       {error && <p className="gallery-error" role="alert">{t('spaceLoadError')}</p>}
     </section>

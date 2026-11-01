@@ -119,7 +119,7 @@ function RoomSession({ space, onExit }: { space: Space; onExit: () => void }) {
     <main className="room" data-space={space.id} aria-label={t('roomLabel')}>
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
         <div className="scene" id="scene" data-light={room.dimmed ? "dimmed" : "normal"}>
-          <img draggable={false} className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={space.id === 'home-work' ? t('sceneAlt') : t('nightSceneAlt')} fetchPriority="high" width={space.width} height={space.height} />
+          <img draggable={false} className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={t(space.altKey)} fetchPriority="high" width={space.width} height={space.height} />
           <ClockDisplay state={timer.state} space={space} />
           {installed && space.id === 'home-work' && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
           <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
@@ -162,7 +162,7 @@ function RoomSession({ space, onExit }: { space: Space; onExit: () => void }) {
         <div className="header-actions"><button className="spaces-button" id="spaces" type="button" onClick={onExit}><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="12" y="3" width="5" height="5" rx="1"/><rect x="3" y="12" width="5" height="5" rx="1"/><rect x="12" y="12" width="5" height="5" rx="1"/></svg><span>{t('spaces')}</span></button><button className="icon-button" id="fullscreen" onClick={room.toggleFullscreen} hidden={!document.fullscreenEnabled} type="button" aria-label={fullscreenLabel} title={fullscreenLabel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button></div>
       </header>
       <footer className="room-footer">
-        <div className="room-caption" id="room-caption"><h1 tabIndex={-1} id="space-title">{space.title}</h1><p className="eyebrow">{space.id === 'home-work' ? 'Lofi · chill · focus' : 'Lofi · synth · night'}</p></div>
+        <div className="room-caption" id="room-caption"><h1 tabIndex={-1} id="space-title">{space.title}</h1><p className="eyebrow">{space.tagline}</p></div>
         <button className="explore-button" id="explore" onClick={room.showLandmarks} type="button" aria-pressed={room.exploring} aria-controls="landmarks"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>{t('explore')}</span></button>
       </footer>
       <p className="sr-only" role="status" aria-live="polite">{timerFeedback.noticeVisible ? timer.noticeText : ""}</p>

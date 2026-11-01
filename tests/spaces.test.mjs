@@ -1,17 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { findSpace, homeWork, nightShift, spaceNotesKey, spaceLightKey } from '../src/spaces.ts';
+import { findSpace, homeWork, nightShift, cafeTerrace, spaceNotesKey, spaceLightKey } from '../src/spaces.ts';
 import { clockReducer, createClock, clockValue } from '../src/clock.ts';
 
 test('restoring a missing or stale space safely opens Home Work', () => {
   for (const id of [null, undefined, '', 'deleted-room', '<script>', {}]) assert.equal(findSpace(id), homeWork);
   assert.equal(findSpace('night-shift'), nightShift);
+  assert.equal(findSpace('cafe-terrace'), cafeTerrace);
 });
 test('space keys retain existing Home Work data and isolate new notes and light', () => {
   assert.equal(spaceNotesKey('home-work'), 'loflume.notes.v1');
   assert.equal(spaceLightKey('home-work'), 'loflume.light');
   assert.notEqual(spaceNotesKey('night-shift'), spaceNotesKey('home-work'));
   assert.notEqual(spaceLightKey('night-shift'), spaceLightKey('home-work'));
+  assert.equal(new Set(['home-work', 'night-shift', 'cafe-terrace'].map(spaceNotesKey)).size, 3);
+  assert.equal(new Set(['home-work', 'night-shift', 'cafe-terrace'].map(spaceLightKey)).size, 3);
 });
 test('leaving a room pauses each clock mode without time leaking into the next room', () => {
   for (const mode of ['timer', 'stopwatch', 'pomodoro']) {

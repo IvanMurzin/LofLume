@@ -139,4 +139,6 @@ export const en = {
   "returnToSpace": "Back to the room",
   "enterSpace": "Enter {name}",
   "previewUnavailable": "Preview unavailable",
+  "cafeSceneAlt": "A woman with a laptop on a café terrace overlooking forested hills at sunset.",
+  "hintMusic": "music",
 } as const;
