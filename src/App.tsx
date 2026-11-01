@@ -159,11 +159,18 @@ function RoomSession({ space, onExit }: { space: Space; onExit: () => void }) {
       </div>
       <header className="room-header">
         <span className="wordmark" aria-label="LofLume"><img src={publicAsset("favicon.svg")} width="28" height="28" alt="" />loflume</span>
-        <div className="header-actions"><button className="spaces-button" id="spaces" type="button" onClick={onExit}><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="12" y="3" width="5" height="5" rx="1"/><rect x="3" y="12" width="5" height="5" rx="1"/><rect x="12" y="12" width="5" height="5" rx="1"/></svg><span>{t('spaces')}</span></button><button className="icon-button" id="fullscreen" onClick={room.toggleFullscreen} hidden={!document.fullscreenEnabled} type="button" aria-label={fullscreenLabel} title={fullscreenLabel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button></div>
+        <div className="header-actions"><button className="icon-button" id="fullscreen" onClick={room.toggleFullscreen} hidden={!document.fullscreenEnabled} type="button" aria-label={fullscreenLabel} title={fullscreenLabel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button></div>
       </header>
-      <footer className="room-footer">
-        <div className="room-caption" id="room-caption"><h1 tabIndex={-1} id="space-title">{space.title}</h1><p className="eyebrow">{space.tagline}</p></div>
-        <button className="explore-button" id="explore" onClick={room.showLandmarks} type="button" aria-pressed={room.exploring} aria-controls="landmarks"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>{t('explore')}</span></button>
+      <footer className={`room-footer${room.exploring ? ' is-exploring' : ''}`}>
+        <div className="room-place">
+          <div className="room-caption" id="room-caption"><h1 tabIndex={-1} id="space-title">{space.title}</h1><p className="eyebrow">{space.tagline}</p></div>
+          <div className="spaces-entry">
+            <button className="spaces-button" id="spaces" type="button" onClick={onExit} aria-label={t('otherSpaces')}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 4 11-2 3 15-3 .5"/><rect x="2" y="6" width="16" height="15" rx="2"/><path d="m5 16 4-4 3 3 3-2"/></svg><span>{t('spaces')}</span></button>
+            <svg className="spaces-hint spaces-hint-wide" viewBox="0 0 220 48" aria-hidden="true"><path d="M69 34 Q32 47 4 23 M5 33 4 23 15 24"/><text x="56" y="23" transform="rotate(-5 56 23)">{t('otherSpaces')}</text></svg>
+            <svg className="spaces-hint spaces-hint-compact" viewBox="0 0 150 24" aria-hidden="true"><text x="0" y="15" transform="rotate(-3 0 15)">{t('otherSpaces')}</text><path d="M112 8 Q130 7 140 22 M133 19 140 22 139 14"/></svg>
+          </div>
+        </div>
+        <button className="explore-button" id="explore" onClick={room.showLandmarks} type="button" aria-pressed={room.exploring} aria-controls="landmarks" aria-label={t('explore')}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>{t('explore')}</span></button>
       </footer>
       <p className="sr-only" role="status" aria-live="polite">{timerFeedback.noticeVisible ? timer.noticeText : ""}</p>
       <p id="status" className="sr-only" role="status" aria-live="polite">{room.status ? t(room.status) : ''}</p>

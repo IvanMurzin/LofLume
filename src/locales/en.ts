@@ -141,4 +141,5 @@ export const en = {
   "previewUnavailable": "Preview unavailable",
   "cafeSceneAlt": "A woman with a laptop on a café terrace overlooking forested hills at sunset.",
   "hintMusic": "music",
+  "otherSpaces": "Other spaces",
 } as const;

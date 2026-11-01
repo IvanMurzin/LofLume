@@ -143,4 +143,5 @@ export const ru = {
   "previewUnavailable": "Превью недоступно",
   "cafeSceneAlt": "Девушка с ноутбуком на веранде кафе с видом на лесистые холмы на закате.",
   "hintMusic": "музыка",
+  "otherSpaces": "\u0414\u0440\u0443\u0433\u0438\u0435 \u0441\u043f\u0435\u0439\u0441\u044b",
 } satisfies Record<keyof typeof en, string>;
