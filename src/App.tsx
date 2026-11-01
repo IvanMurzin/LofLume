@@ -1,6 +1,9 @@
+import { findSpace, homeWork, spaceNotesKey } from './spaces.ts';
+import type { Space, SpaceId } from './spaces.ts';
+import { SpaceGallery } from './SpaceGallery.tsx';
 import { SmallInteractions } from './SmallInteractions.tsx';
 import { useI18n } from './I18n.tsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { LanguagePanel } from './LanguagePanel.tsx';
 import { NotesPanel } from './NotesPanel.tsx';
@@ -21,15 +24,15 @@ import { formatTimer } from './timer.ts';
 import { useTimerFeedback } from './useTimerFeedback.ts';
 import { TimerNotice } from './TimerNotice.tsx';
 
-export function App() {
+function RoomSession({ space, onExit }: { space: Space; onExit: () => void }) {
   const { t, providers } = useI18n();
   const [languageOpen, setLanguageOpen] = useState(false);
   const dictionaryRef = useRef<SVGGElement>(null);
   const closeLanguage = useCallback((returnFocus = true) => { setLanguageOpen(false); if (returnFocus) dictionaryRef.current?.focus({ preventScroll: true }); }, []);
-  const room = useRoom();
-  const music = useMusic();
-  const cassettes = useCassettes();
-  const notes = useNotes();
+  const room = useRoom(space);
+  const music = useMusic(space.id === 'home-work' ? 'loflume.music.volume' : `loflume.music.volume.${space.id}`);
+  const cassettes = useCassettes(space.id === 'home-work' ? 'loflume.cassettes.v1' : `loflume.cassettes.${space.id}.v1`);
+  const notes = useNotes(spaceNotesKey(space.id));
   const [notesPinned, setNotesPinned] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const notesRef = useRef<SVGGElement>(null);
@@ -44,7 +47,7 @@ export function App() {
   const screenAction = useRef<HTMLButtonElement>(null);
   const updateControls = useCallback((controls: ExternalControls | null) => { externalControls.current = controls; setCanControl(!!controls); }, []);
   const closeCassettes = useCallback((returnFocus = true) => { setCassetteOpen(false); if (returnFocus) cassetteRef.current?.focus({ preventScroll: true }); }, []);
-  const timer = useSessionClock();
+  const timer = useSessionClock(space.id, space.title);
   const timerFeedback = useTimerFeedback(timer.state, music.state.volume, timer);
   const toggleTimer = () => {
     if (timer.state.phase !== "running" && timer.valid) timerFeedback.prepareSound();
@@ -113,15 +116,15 @@ export function App() {
     if (openRadio) { setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(true); }
   }
   return (
-    <main className="room" aria-label={t('roomLabel')}>
+    <main className="room" data-space={space.id} aria-label={t('roomLabel')}>
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
         <div className="scene" id="scene" data-light={room.dimmed ? "dimmed" : "normal"}>
-          <img draggable={false} className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={t('sceneAlt')} fetchPriority="high" width="1671" height="941" />
-          <ClockDisplay state={timer.state} />
-          {installed && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
+          <img draggable={false} className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={space.id === 'home-work' ? t('sceneAlt') : t('nightSceneAlt')} fetchPriority="high" width={space.width} height={space.height} />
+          <ClockDisplay state={timer.state} space={space} />
+          {installed && space.id === 'home-work' && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
           <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
-          <SceneArtwork dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { if (!notesPinned) setNotesOpen(false); setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); if (notesOpen) raisePanel('notes-panel'); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); if (cassetteOpen) raisePanel('cassette-panel'); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); if (timerOpen) raisePanel('timer-panel'); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
-          <SmallInteractions />
+          <SceneArtwork space={space} dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { if (!notesPinned) setNotesOpen(false); setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); if (notesOpen) raisePanel('notes-panel'); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); if (cassetteOpen) raisePanel('cassette-panel'); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); if (timerOpen) raisePanel('timer-panel'); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <SmallInteractions space={space} />
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">{t('radio')}</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label={t('closeRadio')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>
@@ -156,10 +159,10 @@ export function App() {
       </div>
       <header className="room-header">
         <span className="wordmark" aria-label="LofLume"><img src={publicAsset("favicon.svg")} width="28" height="28" alt="" />loflume</span>
-        <button className="icon-button" id="fullscreen" onClick={room.toggleFullscreen} hidden={!document.fullscreenEnabled} type="button" aria-label={fullscreenLabel} title={fullscreenLabel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button>
+        <div className="header-actions"><button className="spaces-button" id="spaces" type="button" onClick={onExit}><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="12" y="3" width="5" height="5" rx="1"/><rect x="3" y="12" width="5" height="5" rx="1"/><rect x="12" y="12" width="5" height="5" rx="1"/></svg><span>{t('spaces')}</span></button><button className="icon-button" id="fullscreen" onClick={room.toggleFullscreen} hidden={!document.fullscreenEnabled} type="button" aria-label={fullscreenLabel} title={fullscreenLabel}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5H5v3m11-3h3v3M5 16v3h3m11-3v3h-3"/></svg></button></div>
       </header>
       <footer className="room-footer">
-        <div className="room-caption" id="room-caption"><h1>Home Work</h1><p className="eyebrow">Lofi · chill · focus</p></div>
+        <div className="room-caption" id="room-caption"><h1 tabIndex={-1} id="space-title">{space.title}</h1><p className="eyebrow">{space.id === 'home-work' ? 'Lofi · chill · focus' : 'Lofi · synth · night'}</p></div>
         <button className="explore-button" id="explore" onClick={room.showLandmarks} type="button" aria-pressed={room.exploring} aria-controls="landmarks"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span>{t('explore')}</span></button>
       </footer>
       <p className="sr-only" role="status" aria-live="polite">{timerFeedback.noticeVisible ? timer.noticeText : ""}</p>
@@ -167,4 +170,52 @@ export function App() {
       <div id="image-error" className="image-error" hidden={!room.imageError}><p>{t('roomError')}</p><button type="button" id="retry-image" onClick={room.retryImage}>{t('tryAgain')}</button></div>
     </main>
   );
+}
+
+export function App() {
+  const { t } = useI18n();
+  const [spaceId, setSpaceId] = useState<SpaceId>(() => {
+    try { return findSpace(localStorage.getItem('loflume.space.v1')).id; } catch { return homeWork.id; }
+  });
+  const space = findSpace(spaceId);
+  const [gallery, setGallery] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+  const transition = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const mounted = useRef(true);
+  const busy = useRef(false);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; clearTimeout(transition.current); }; }, []);
+  useLayoutEffect(() => {
+    document.documentElement.dataset.space = gallery ? 'gallery' : space.id;
+    const frame = requestAnimationFrame(() => document.getElementById(gallery ? 'gallery-title' : 'space-title')?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [space.id, gallery]);
+  useEffect(() => { if (gallery) document.title = `LofLume — ${t('spaces')}`; }, [gallery, t]);
+  useLayoutEffect(() => {
+    document.documentElement.toggleAttribute('data-space-changing', leaving);
+    return () => document.documentElement.removeAttribute('data-space-changing');
+  }, [leaving]);
+  function switchView(next: () => void) {
+    setLeaving(true);
+    const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+    transition.current = setTimeout(() => { next(); setLeaving(false); busy.current = false; }, delay);
+  }
+  async function enter(next: Space) {
+    if (busy.current) return;
+    busy.current = true; setLoading(next.id); setError(false);
+    try {
+      const image = new Image(); image.src = publicAsset(next.image); await image.decode();
+      if (!mounted.current) return;
+      switchView(() => {
+        setSpaceId(next.id); setGallery(false); setLoading(null);
+        try { localStorage.setItem('loflume.space.v1', next.id); } catch { /* Optional preference. */ }
+      });
+    } catch {
+      if (mounted.current) { setError(true); setLoading(null); busy.current = false; }
+    }
+  }
+  return <div className={`space-view${leaving ? ' is-leaving' : ''}`} inert={leaving || undefined}>
+    {gallery ? <SpaceGallery current={space.id} loading={loading} error={error} onEnter={enter} /> : <RoomSession key={space.id} space={space} onExit={() => { if (busy.current) return; busy.current = true; switchView(() => setGallery(true)); }} />}
+  </div>;
 }

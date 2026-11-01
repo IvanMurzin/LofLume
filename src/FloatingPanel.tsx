@@ -43,6 +43,13 @@ export function FloatingPanel({ panelRef, anchorRef, id, className, title, headi
     if (placement === 'notes') x = (anchor ? anchor.left + anchor.width / 2 : view.width / 2) - dimensions.width / 2;
     x = Math.max(12, Math.min(x, view.width - dimensions.width - 12));
     y = Math.max(12, Math.min(y, view.height - dimensions.height - 12));
+    // A clock near the upper/left edge needs its panel below it, rather than
+    // clamped over the physical display and its completion notice.
+    if (placement === 'timer' && anchor && x < anchor.right && x + dimensions.width > anchor.left && y < anchor.bottom && y + dimensions.height > anchor.top) {
+      x = Math.max(12, Math.min(anchor.left, view.width - dimensions.width - 12));
+      y = Math.max(12, Math.min(anchor.bottom + 16, view.height - dimensions.height - 12));
+      if (y < anchor.bottom) x = Math.max(12, Math.min(anchor.right + 16, view.width - dimensions.width - 12));
+    }
     const others = [...document.querySelectorAll<HTMLElement>('.floating-panel:not([hidden])')]
       .filter(panel => panel !== panelRef.current && panel.style.visibility !== 'hidden').map(panel => panel.getBoundingClientRect());
     const clear = (point: Point) => others.every(rect => point.x + dimensions.width + 10 <= rect.left || point.x >= rect.right + 10 || point.y + dimensions.height + 10 <= rect.top || point.y >= rect.bottom + 10);

@@ -1,3 +1,4 @@
+import type { Space } from './spaces.ts';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from './I18n.tsx';
 import { loadFacts, pickNextFactIndex } from './facts.ts';
@@ -6,7 +7,7 @@ import type { Fact } from './facts.ts';
 type ObjectName = 'coffee' | 'platypus';
 
 /** Small, optional discoveries. No audio, persistence or payment service until configured. */
-export function SmallInteractions() {
+export function SmallInteractions({ space }: { space: Space }) {
   const { t, locale } = useI18n();
   const [feedback, setFeedback] = useState<{ object: ObjectName; revision: number; factIndex: number | null } | null>(null);
   const [visible, setVisible] = useState(false);
@@ -60,12 +61,12 @@ export function SmallInteractions() {
   }, [visible, feedback]);
 
   return <>
-    <svg className="room-objects small-objects" viewBox="0 0 1671 941" aria-label={t('smallObjects')}>
-      <g className="object-target" data-object="platypus" role="button" tabIndex={0} aria-label={t('platypusAction')} onClick={() => activate('platypus')} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate('platypus'); } }}>
+    <svg className="room-objects small-objects" viewBox={`0 0 ${space.width} ${space.height}`} aria-label={t('smallObjects')}>
+      {space.id === 'home-work' && <g className="object-target" data-object="platypus" role="button" tabIndex={0} aria-label={t('platypusAction')} onClick={() => activate('platypus')} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate('platypus'); } }}>
         <path className="object-shape" d="M90 378 C86 357 104 333 129 329 C155 324 180 338 186 361 L188 374 C194 378 201 381 198 387 Q196 394 184 398 Q190 409 194 425 Q202 424 204 433 C208 443 201 453 194 454 L168 453 Q145 456 122 453 L85 451 Q64 452 58 441 C50 427 60 408 72 393 Q82 383 90 378 Z"/>
-      </g>
+      </g>}
       <g className="object-target" data-object="coffee" role="button" tabIndex={0} aria-label={t('coffeeAction')} onClick={() => activate('coffee')} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate('coffee'); } }}>
-        <path className="object-shape" d="M696 656 L700 647 Q700 639 715 638 L786 637 Q800 637 803 644 L805 655 L815 658 Q820 661 816 669 L808 673 L799 785 Q799 794 780 795 L725 794 Q711 793 710 785 L699 676 L691 673 Q685 669 691 660 Z"/>
+        <path fillRule="evenodd" className="object-shape" d={space.id === 'night-shift' ? 'M118 678 C132 665 189 666 209 675 Q215 677 215 687 L215 696 C232 690 245 704 248 719 C252 740 240 765 214 775 L211 795 Q177 811 130 802 Q118 800 118 791 Z M216 706 C231 699 241 713 239 728 C238 743 228 757 215 762 Z' : "M696 656 L700 647 Q700 639 715 638 L786 637 Q800 637 803 644 L805 655 L815 658 Q820 661 816 669 L808 673 L799 785 Q799 794 780 795 L725 794 Q711 793 710 785 L699 676 L691 673 Q685 669 691 660 Z"}/>
       </g>
 
     </svg>

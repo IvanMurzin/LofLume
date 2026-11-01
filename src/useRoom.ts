@@ -1,21 +1,23 @@
+import { homeWork, spaceLightKey } from './spaces.ts';
+import type { Space } from './spaces.ts';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { publicAsset } from './assets.ts';
 
-export function useRoom() {
+export function useRoom(space: Space = homeWork) {
   const [dimmed, setDimmed] = useState(() => {
-    try { return localStorage.getItem('loflume.light') === 'dimmed'; } catch { return false; }
+    try { return localStorage.getItem(spaceLightKey(space.id)) === 'dimmed'; } catch { return false; }
   });
   const toggleLight = () => setDimmed(current => {
     const next = !current;
-    try { localStorage.setItem('loflume.light', next ? 'dimmed' : 'normal'); } catch { /* Optional preference. */ }
+    try { localStorage.setItem(spaceLightKey(space.id), next ? 'dimmed' : 'normal'); } catch { /* Optional preference. */ }
     return next;
   });
   const [exploring, setExploring] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [status, setStatus] = useState<'' | 'fullscreenDenied'>('');
   const [imageError, setImageError] = useState(false);
-  const [imageSrc, setImageSrc] = useState(publicAsset('assets/cozy-coding-v6.webp'));
-  const [ratio, setRatio] = useState(1671 / 941);
+  const [imageSrc, setImageSrc] = useState(publicAsset(space.image));
+  const [ratio, setRatio] = useState(space.width / space.height);
   const imageRef = useRef<HTMLImageElement>(null);
   const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hideLandmarks = useCallback(() => {
@@ -58,7 +60,7 @@ export function useRoom() {
   return {
     dimmed, toggleLight, exploring, fullscreen, status, imageError, imageSrc, ratio, imageRef, imageLoaded,
     imageFailed() { setImageError(true); },
-    retryImage() { setImageError(false); setImageSrc(`${publicAsset('assets/cozy-coding-v6.webp')}?retry=${Date.now()}`); },
+    retryImage() { setImageError(false); setImageSrc(`${publicAsset(space.image)}?retry=${Date.now()}`); },
     showLandmarks() {
       clearTimeout(timeout.current);
       setExploring(true);

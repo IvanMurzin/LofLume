@@ -1,3 +1,4 @@
+import type { Space } from './spaces.ts';
 import { formatTimer } from './timer.ts';
 import type { TimerState } from './timer.ts';
 
@@ -10,20 +11,22 @@ const digits: Record<string, string> = {
   '5': '05623', '6': '056432', '7': '012', '8': '0123456', '9': '012356',
 };
 
-export function ClockDisplay({ state }: { state: TimerState }) {
+export function ClockDisplay({ state, space }: { state: TimerState; space: Space }) {
   const text = formatTimer(state.remainingMs);
   const [minutes, seconds] = text.split(':') as [string, string];
   const count = minutes.length + seconds.length;
   const width = count * 25 + 10;
-  const scale = Math.min(.85, 94 / width);
-  return <svg className="clock-display" viewBox="0 0 1671 941" aria-hidden="true" data-phase={state.phase}>
+  const scale = Math.min(.85, space.clock.width / width);
+  return <svg className="clock-display" viewBox={`0 0 ${space.width} ${space.height}`} aria-hidden="true" data-phase={state.phase}>
     <defs>
       <linearGradient id="clock-face" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#0d0b08"/><stop offset="1" stopColor="#0c0a07"/></linearGradient>
+      <clipPath id="clock-screen-clip"><path d={space.clock.face}/></clipPath>
     </defs>
-    <g transform="translate(-27 0)">
-    <path d="M1284 695 L1395 705 L1387 755 L1276 744Z" fill="url(#clock-face)"/>
-    <g transform={`matrix(1 .1 -.14 1 ${1287 + (94 - width * scale) / 2} 704)`}>
-      <g transform={`scale(${scale} .85)`} className="clock-digits">
+    <g transform={space.clock.offset}>
+    {!space.clock.preserveFace && <path d={space.clock.face} fill="url(#clock-face)"/>}
+    <g clipPath={space.clock.preserveFace ? "url(#clock-screen-clip)" : undefined}>
+    <g transform={`matrix(${space.clock.matrix.map((value, index) => index === 4 ? value + (space.clock.width - width * scale) / 2 : value).join(' ')})`}>
+      <g transform={`scale(${scale} ${space.clock.height})`} className="clock-digits">
         {[...minutes, ':', ...seconds].map((digit, i) => {
           const x = i <= minutes.length ? i * 25 : (i - 1) * 25 + 10;
           if (digit === ':') return <g key={i} transform={`translate(${x} 0)`} className="clock-colon"><circle cx="2" cy="13" r="1.8"/><circle cx="2" cy="28" r="1.8"/></g>;
@@ -31,6 +34,6 @@ export function ClockDisplay({ state }: { state: TimerState }) {
         })}
       </g>
     </g>
-    </g>
+    </g></g>
   </svg>;
 }
