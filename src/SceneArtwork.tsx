@@ -1,10 +1,11 @@
+import { RainSwitch } from './RainSwitch.tsx';
 import type { Space } from './spaces.ts';
 import { useI18n } from './I18n.tsx';
 import type { RefObject } from "react";
 
-type Props = { space: Space; dictionaryRef: RefObject<SVGGElement | null>; languageOpen: boolean; onOpenLanguage: () => void; notesRef: RefObject<SVGGElement | null>; notesOpen: boolean; onOpenNotes: () => void; cassetteRef: RefObject<SVGGElement | null>; cassetteOpen: boolean; onOpenCassettes: () => void; dimmed: boolean; onToggleLight: () => void; exploring: boolean; playing: boolean; panelOpen: boolean; radioRef: RefObject<SVGGElement | null>; onOpenRadio: () => void; clockRef: RefObject<SVGGElement | null>; timerOpen: boolean; timerLabel: string; onOpenTimer: () => void };
+type Props = { rain?: { enabled: boolean; toggle: () => void }; space: Space; dictionaryRef: RefObject<SVGGElement | null>; languageOpen: boolean; onOpenLanguage: () => void; notesRef: RefObject<SVGGElement | null>; notesOpen: boolean; onOpenNotes: () => void; cassetteRef: RefObject<SVGGElement | null>; cassetteOpen: boolean; onOpenCassettes: () => void; dimmed: boolean; onToggleLight: () => void; exploring: boolean; playing: boolean; panelOpen: boolean; radioRef: RefObject<SVGGElement | null>; onOpenRadio: () => void; clockRef: RefObject<SVGGElement | null>; timerOpen: boolean; timerLabel: string; onOpenTimer: () => void };
 
-export function SceneArtwork({ space, dictionaryRef, languageOpen, onOpenLanguage, notesRef, notesOpen, onOpenNotes, cassetteRef, cassetteOpen, onOpenCassettes, dimmed, onToggleLight, exploring, playing, panelOpen, radioRef, onOpenRadio, clockRef, timerOpen, timerLabel, onOpenTimer }: Props) {
+export function SceneArtwork({ rain, space, dictionaryRef, languageOpen, onOpenLanguage, notesRef, notesOpen, onOpenNotes, cassetteRef, cassetteOpen, onOpenCassettes, dimmed, onToggleLight, exploring, playing, panelOpen, radioRef, onOpenRadio, clockRef, timerOpen, timerLabel, onOpenTimer }: Props) {
   const { t } = useI18n();
   return <>
           <svg className={exploring ? "room-objects is-exploring" : "room-objects"} id="room-objects" viewBox={`0 0 ${space.width} ${space.height}`} aria-label={t('roomObjects')}>
@@ -23,7 +24,9 @@ export function SceneArtwork({ space, dictionaryRef, languageOpen, onOpenLanguag
             </g>
             <g ref={cassetteRef} className="object-target" data-object="cassettes" tabIndex={0} role="button" aria-label={t('tapesHint')} aria-haspopup="dialog" aria-expanded={cassetteOpen} aria-controls="cassette-panel" onClick={onOpenCassettes} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onOpenCassettes(); } }}><path className="object-shape" d={space.objects.cassettes}/></g>
             <g ref={notesRef} className="object-target" data-object="notes" tabIndex={0} role="button" aria-label={t('notesHint')} aria-haspopup="dialog" aria-expanded={notesOpen} aria-controls="notes-panel" onClick={onOpenNotes} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onOpenNotes(); } }}><path className="object-shape" d={space.objects.notes}/></g>
+            {rain && <RainSwitch enabled={rain.enabled} onToggle={rain.toggle} />}
             <g className="annotations" id="landmarks" aria-hidden="true">
+              {rain && <g className="annotation"><text x="1392" y="383" transform="rotate(-5 1392 383)">{t('rain')}</text><path className="annotation-arrow" d="M1490 390 Q1522 386 1550 409"/></g>}
               {space.landmarks.map(mark => <g className="annotation" key={mark.key}><text x={mark.x} y={mark.y} transform={`rotate(${mark.rotation ?? -5} ${mark.x} ${mark.y})`}>{t(mark.key)}</text><path className="annotation-arrow" d={mark.arrow}/></g>)}
             </g>
           </svg>

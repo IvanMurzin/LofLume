@@ -1,4 +1,8 @@
 export const en = {
+  "rain": "Rain",
+  "enableRain": "Turn on rain",
+  "disableRain": "Turn off rain",
+  "rainError": "Could not start rain audio. Try again.",
   "loading": "Loading…",
   "retry": "Retry",
   "tryAgain": "Try again",

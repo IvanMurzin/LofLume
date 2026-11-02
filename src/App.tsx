@@ -1,3 +1,5 @@
+import { RainLayer } from './RainLayer.tsx';
+import { useRain } from './useRain.ts';
 import { findSpace, homeWork, spaceNotesKey } from './spaces.ts';
 import type { Space, SpaceId } from './spaces.ts';
 import { SpaceGallery } from './SpaceGallery.tsx';
@@ -30,6 +32,7 @@ function RoomSession({ space, onExit }: { space: Space; onExit: () => void }) {
   const dictionaryRef = useRef<SVGGElement>(null);
   const closeLanguage = useCallback((returnFocus = true) => { setLanguageOpen(false); if (returnFocus) dictionaryRef.current?.focus({ preventScroll: true }); }, []);
   const room = useRoom(space);
+  const rain = useRain();
   const music = useMusic(space.id === 'home-work' ? 'loflume.music.volume' : `loflume.music.volume.${space.id}`);
   const cassettes = useCassettes(space.id === 'home-work' ? 'loflume.cassettes.v1' : `loflume.cassettes.${space.id}.v1`);
   const notes = useNotes(spaceNotesKey(space.id));
@@ -120,11 +123,13 @@ function RoomSession({ space, onExit }: { space: Space; onExit: () => void }) {
       <div className="scene-viewport" style={{ "--scene-ratio": room.ratio } as CSSProperties}>
         <div className="scene" id="scene" data-light={room.dimmed ? "dimmed" : "normal"}>
           <img draggable={false} className="scene-image" id="scene-image" ref={room.imageRef} src={room.imageSrc} onLoad={room.imageLoaded} onError={room.imageFailed} alt={t(space.altKey)} fetchPriority="high" width={space.width} height={space.height} />
+          {space.id === 'cafe-terrace' && <RainLayer enabled={rain.enabled} />}
           <ClockDisplay state={timer.state} space={space} />
           {installed && space.id === 'home-work' && <svg className="cassette-indicator" viewBox="0 0 1671 941" aria-hidden="true"><g transform="matrix(1 .065 0 1 1438 687)"><rect x="0" y="0" width="103" height="28" rx="3"/><circle cx="10" cy="14" r="2.2" className={externalPhase === 'playing' ? 'tape-led is-playing' : 'tape-led'}/><text x="20" y="18">{installed.tape.name.length > 12 ? installed.tape.name.slice(0, 11) + '…' : installed.tape.name}</text></g></svg>}
           <TimerNotice message={timer.noticeText} visible={timerFeedback.noticeVisible} onDismiss={timerFeedback.dismissNotice} />
-          <SceneArtwork space={space} dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { if (!notesPinned) setNotesOpen(false); setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); if (notesOpen) raisePanel('notes-panel'); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); if (cassetteOpen) raisePanel('cassette-panel'); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); if (timerOpen) raisePanel('timer-panel'); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
+          <SceneArtwork rain={space.id === 'cafe-terrace' ? rain : undefined} space={space} dictionaryRef={dictionaryRef} languageOpen={languageOpen} onOpenLanguage={() => { if (!notesPinned) setNotesOpen(false); setCassetteOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setLanguageOpen(true); }} notesRef={notesRef} notesOpen={notesOpen} onOpenNotes={() => { setLanguageOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); setCassetteOpen(false); if (notesOpen) raisePanel('notes-panel'); setNotesOpen(true); }} cassetteRef={cassetteRef} cassetteOpen={cassetteOpen} onOpenCassettes={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); if (!timerPinned) setTimerOpen(false); setPanelOpen(false); if (cassetteOpen) raisePanel('cassette-panel'); setCassetteOpen(true); }} dimmed={room.dimmed} onToggleLight={room.toggleLight} clockRef={clockRef} timerOpen={timerOpen} timerLabel={t('clockTime', { time: formatTimer(timer.state.remainingMs) })} onOpenTimer={() => { setLanguageOpen(false); if (!notesPinned) setNotesOpen(false); timerFeedback.dismissNotice(); setCassetteOpen(false); setPanelOpen(false); if (timerOpen) raisePanel('timer-panel'); setTimerOpen(true); }} exploring={room.exploring} playing={playing} panelOpen={panelOpen} radioRef={radioRef} onOpenRadio={openPanel} />
           <SmallInteractions space={space} />
+          {space.id === 'cafe-terrace' && rain.error && <p className="rain-error" role="status">{t('rainError')}</p>}
           <section className="music-panel" id="music-panel" ref={panelRef} data-phase={state.phase} role="dialog" aria-modal="false" aria-labelledby="music-heading" hidden={!panelOpen}>
             <header className="music-panel-heading"><span id="music-heading">{t('radio')}</span><button className="music-close" id="music-close" onClick={() => closePanel()} type="button" aria-label={t('closeRadio')}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
             <p id="music-title" className="music-title" aria-live="polite">{state.track.title}</p>

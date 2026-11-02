@@ -957,3 +957,23 @@ html, body { overflow: hidden; overflow: clip; }
 @media (max-height: 500px) and (orientation: landscape) and (max-width: 699px) {
   .spaces-hint-compact { bottom: calc(100% - 7px); width: 112px; height: 18px; }
 }
+
+/* Outdoor weather belongs to the café artwork, not the viewport. */
+.rain-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 850ms ease; }
+.rain-layer.is-on { opacity: 1; }
+/* A physical brass plate follows the artwork rather than the viewport. */
+.rain-switch { cursor: pointer; outline: none; }
+.rain-switch > :not(.rain-switch-hit) { pointer-events: none; }
+.rain-switch-plate { fill: url(#rain-switch-brass); stroke: #b48d60; stroke-width: .8; filter: drop-shadow(1px 2px 2px rgb(20 12 8 / 55%)); transition: stroke 220ms ease, filter 220ms ease; }
+.rain-switch-screws { fill: #b18c60; }
+.rain-switch-cloud { fill: none; stroke: #dec39b; stroke-width: 1.15; stroke-linecap: round; stroke-linejoin: round; }
+.rain-switch-drops { opacity: .25; transition: opacity 220ms ease; }
+.rain-switch-slot { fill: #251d18; stroke: #987953; stroke-width: .7; }
+.rain-switch-knob { fill: #bfa17a; stroke: #e2c297; stroke-width: .6; transition: cy 220ms ease, fill 220ms ease; }
+.rain-switch-hit { fill: transparent; stroke: transparent; stroke-width: 14px; vector-effect: non-scaling-stroke; pointer-events: all; }
+.rain-switch:hover .rain-switch-plate, .is-exploring .rain-switch-plate { stroke: #e2c297; filter: drop-shadow(0 0 4px rgb(239 200 145 / 45%)); }
+.rain-switch:focus-visible .rain-switch-plate { stroke: #fff0cc; stroke-width: 2; }
+.rain-switch[aria-pressed="true"] .rain-switch-drops { opacity: 1; }
+.rain-switch[aria-pressed="true"] .rain-switch-knob { fill: #ead0a5; }
+.rain-error { position: absolute; right: 7.5%; top: 39%; z-index: 20; width: 220px; max-width: 80%; margin: 0; padding: 12px; border-radius: 8px; background: var(--ink-25211e); font-size: 12px; box-shadow: 0 4px 20px #0005; }
+@media (prefers-reduced-motion: reduce) { .rain-layer, .rain-switch-plate, .rain-switch-drops, .rain-switch-knob { transition: none; } }
