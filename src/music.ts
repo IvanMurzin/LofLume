@@ -6,6 +6,9 @@ export class SceneMusic {
   private audio: AudioPort;
   private tracks: readonly Track[];
   private index = 0;
+  private queue: number[];
+  private cursor = 0;
+  private random: () => number;
   private phase: MusicState['phase'] = 'idle';
   private error: string | null = null;
   private request = 0;
@@ -13,10 +16,13 @@ export class SceneMusic {
   private loaded = false;
   private listeners = new Set<(state: MusicState) => void>();
 
-  constructor(audio: AudioPort, tracks: readonly Track[], volume = .45) {
+  constructor(audio: AudioPort, tracks: readonly Track[], volume = .45, random = Math.random) {
     if (!tracks.length) throw new Error('A music catalog is required');
     this.audio = audio;
     this.tracks = tracks;
+    this.random = random;
+    this.queue = this.shuffle();
+    this.index = this.queue[0]!;
     this.setVolume(volume);
     audio.addEventListener('ended', this.onEnded);
     audio.addEventListener('error', this.onError);
@@ -35,6 +41,19 @@ export class SceneMusic {
   }
 
   private notify(): void { for (const listener of this.listeners) listener(this.state); }
+
+  private shuffle(previous?: number): number[] {
+    const queue = this.tracks.map((_, index) => index);
+    for (let i = queue.length - 1; i > 0; i--) {
+      const j = Math.floor(this.random() * (i + 1));
+      [queue[i], queue[j]] = [queue[j]!, queue[i]!];
+    }
+    if (queue.length > 1 && queue[0] === previous) {
+      const j = 1 + Math.floor(this.random() * (queue.length - 1));
+      [queue[0], queue[j]] = [queue[j]!, queue[0]!];
+    }
+    return queue;
+  }
 
   async play(): Promise<void> {
     const request = ++this.request;
@@ -77,7 +96,12 @@ export class SceneMusic {
     ++this.request;
     this.wanted = false;
     this.audio.pause();
-    this.index = (this.index + 1) % this.tracks.length;
+    this.cursor++;
+    if (this.cursor === this.queue.length) {
+      this.queue = this.shuffle(this.index);
+      this.cursor = 0;
+    }
+    this.index = this.queue[this.cursor]!;
     this.audio.src = this.tracks[this.index]!.url;
     this.audio.load();
     this.loaded = true;
